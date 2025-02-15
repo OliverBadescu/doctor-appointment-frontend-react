@@ -1,60 +1,54 @@
 import { useEffect, useState } from "react"
 import Spinner from 'react-bootstrap/Spinner';
 import { Alert } from 'antd';
-import Patient from "./Patient/Patients";
-import { getAllPatients } from "../services/patientService";
-import { useNavigate } from 'react-router-dom';
+import Patient from "../Patient/Patients";
+import { getAllPatientAppointments } from "../../services/appointmentService";
+import { useNavigate, useParams } from 'react-router-dom';
+import Appointment from "../Appointment/Appointment";
 
 
+export default function Appointments(){
 
-export default function Home() {
+    const { patientId } = useParams();
 
-
-    let [patients, setPatients] = useState([]);
+    let [appointments, setAppointments] = useState([]);
     let [loading, setLoading] = useState(false);
     const [error, setError] = useState([]);
-
+    
     const [showA, setShowA] = useState(true);
     const toggleShowA = () => setShowA(!showA);
-
+    
     const navigate = useNavigate();
-
+    
     const handleNavigation = (event, path) => {
         event.preventDefault(); 
         navigate(path);
-        
+            
     };
-    
-    const fetchPatients = async () =>{
-        setLoading(true);
         
+    const fetchAppointments = async () =>{
+        setLoading(true);
+            
         const newErrors = [];
-
-        try{
-            const response = await getAllPatients();
-            if(response.success && response.body?.list){
-                setPatients(response.body.list);
-            }else{
-                newErrors.push("Failed to fetch patients");
-            }
-        }catch (err){
-            newErrors.push(err.message);
-        }finally{
-            setLoading(false);
+    
+    try{
+        const response = await getAllPatientAppointments(patientId);
+        if(response.success && response.body?.appointments){
+            setAppointments(response.body.appointments);
+        }else{
+            newErrors.push("Failed to fetch appointments");
         }
-
+    }catch (err){
+        newErrors.push(err.message);
+    }finally{
+        setLoading(false);
+    }
         setError(newErrors);
     }
-
-
+    
     useEffect(() => {
-
-        fetchPatients();
-
+        fetchAppointments();
     }, [])
-
-
-
 
     return (
         <> 
@@ -74,7 +68,7 @@ export default function Home() {
                     error.length == 0 && !loading &&(
                         <Alert
                         message="Success"
-                        description="Patients loaded succesfully"
+                        description="Appointments loaded succesfully"
                         type="success"
                         showIcon
                         closable
@@ -82,18 +76,15 @@ export default function Home() {
                     )
                }
         </div>
-            <h1>Patient</h1>
-            <div className="button-container"> 
-                <button className="button" onClick={(event) => handleNavigation(event, '/new-patient')}>Create New Patient</button>
-                <button className="button" onClick={(event) => handleNavigation(event, '/doctor-page')}>Manage Doctors</button>
-                <button className="button" onClick={(event) => handleNavigation(event, '/clinic-page')}>Manage Clinics</button>
-            </div>
+            <h1>Appointments</h1>
+            <p><a className="button" onClick={(event) => handleNavigation(event, '/new-patient')}>Create New Appointment</a> <a className="button" onClick={(event) => handleNavigation(event, '/Home')}>Cancel</a> </p>
             <table>
                 <thead>
                     <tr>
-                        <th>Full Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Doctor</th>
+                        <th>Clinic</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,8 +102,8 @@ export default function Home() {
                     }
                    
                     {
-                        !loading && patients.length > 0 &&
-                        patients.map((pa) => <Patient key={pa.id} patient={pa} />)
+                        !loading && appointments.length > 0 &&
+                        appointments.map((ap) => <Appointment key={ap.id} appointment={ap} />)
                     }
 
                     
@@ -122,5 +113,6 @@ export default function Home() {
             
         </>
     )
+
 
 }

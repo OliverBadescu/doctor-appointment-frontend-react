@@ -1,15 +1,15 @@
-
+import { useNavigate } from 'react-router-dom';
 
 
 
 export default function Patient({patient}){
 
+    const navigate = useNavigate();
 
-    const handleViewAppointmentsButton = (event) =>{
-
+    const handleNavigation = (event, path) => {
         event.preventDefault();
-
-    }
+        navigate(path);
+      };
 
     return (
         <tr>
@@ -18,7 +18,7 @@ export default function Patient({patient}){
         </td>
         <td>{patient.email}</td>
         <td>{patient.phone}</td>
-        <button className="appointments-button" onClick={handleViewAppointmentsButton}>View appointments</button>
+        <button className="appointments-button" onClick={(event) => handleNavigation(event, `/appointment-page/${patient.id}`)}>View appointments</button>
     </tr>
     )
 }

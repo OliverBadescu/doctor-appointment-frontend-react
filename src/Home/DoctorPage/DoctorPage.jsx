@@ -1,16 +1,14 @@
+import { getAllDoctors } from "../../services/doctorService";
 import { useEffect, useState } from "react"
 import Spinner from 'react-bootstrap/Spinner';
 import { Alert } from 'antd';
-import Patient from "./Patient/Patients";
-import { getAllPatients } from "../services/patientService";
+import Doctor from "../Doctor/Doctor";
 import { useNavigate } from 'react-router-dom';
 
 
+export default function DoctorPage(){
 
-export default function Home() {
-
-
-    let [patients, setPatients] = useState([]);
+    let [doctors, setDoctors] = useState([]);
     let [loading, setLoading] = useState(false);
     const [error, setError] = useState([]);
 
@@ -25,17 +23,17 @@ export default function Home() {
         
     };
     
-    const fetchPatients = async () =>{
+    const fetchDoctors = async () =>{
         setLoading(true);
         
         const newErrors = [];
 
         try{
-            const response = await getAllPatients();
+            const response = await getAllDoctors();
             if(response.success && response.body?.list){
-                setPatients(response.body.list);
+                setDoctors(response.body.list);
             }else{
-                newErrors.push("Failed to fetch patients");
+                newErrors.push("Failed to fetch doctors");
             }
         }catch (err){
             newErrors.push(err.message);
@@ -49,7 +47,7 @@ export default function Home() {
 
     useEffect(() => {
 
-        fetchPatients();
+        fetchDoctors();
 
     }, [])
 
@@ -74,7 +72,7 @@ export default function Home() {
                     error.length == 0 && !loading &&(
                         <Alert
                         message="Success"
-                        description="Patients loaded succesfully"
+                        description="Doctors loaded succesfully"
                         type="success"
                         showIcon
                         closable
@@ -82,11 +80,10 @@ export default function Home() {
                     )
                }
         </div>
-            <h1>Patient</h1>
+            <h1>Doctor</h1>
             <div className="button-container"> 
-                <button className="button" onClick={(event) => handleNavigation(event, '/new-patient')}>Create New Patient</button>
-                <button className="button" onClick={(event) => handleNavigation(event, '/doctor-page')}>Manage Doctors</button>
-                <button className="button" onClick={(event) => handleNavigation(event, '/clinic-page')}>Manage Clinics</button>
+                <button className="button">Create New Doctor</button>
+                <button className="cancel-button"  onClick={(event) => handleNavigation(event, '/Home')}>Cancel</button>
             </div>
             <table>
                 <thead>
@@ -94,6 +91,8 @@ export default function Home() {
                         <th>Full Name</th>
                         <th>Email</th>
                         <th>Phone</th>
+                        <th>Specialization</th>
+                        <th>Clinic</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -111,8 +110,8 @@ export default function Home() {
                     }
                    
                     {
-                        !loading && patients.length > 0 &&
-                        patients.map((pa) => <Patient key={pa.id} patient={pa} />)
+                        !loading && doctors.length > 0 &&
+                        doctors.map((dc) => <Doctor key={dc.id} doctor={dc} />)
                     }
 
                     
@@ -122,5 +121,4 @@ export default function Home() {
             
         </>
     )
-
 }
