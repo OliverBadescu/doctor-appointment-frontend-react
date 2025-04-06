@@ -1,113 +1,197 @@
-body {
-  padding: 10px 50px 50px;
-  font: 18px "Garamond", serif;
+.root{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
 }
 
-a {
-  color: #019875;
-  text-decoration: none;
-  font-weight: bold;
-  transition: 0.4s;
-}
 
-  a:hover {
-    color: black;
-  }
-
-a.button, input[type=submit], button {
-  color: white;
-  background: #019875;
-  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
-  padding: 10px 14px 12px;
-  font-size: 14px;
-  border-radius: 2px;
-  cursor: pointer;
-}
-
-form a.button, input[type=submit], button {
-  margin-left: 140px;
-  transition: 0.4s;
-}
-
-input[type=submit], button {
-  border: 0;
-}
-
-  a.button:hover, input[type=submit]:hover,button:hover {
-    background-color: #01b189;
-  }
-
-p {
-  margin: 20px auto;
-}
-
-ul {
-  padding: 0;
-  list-style-type: none;
-  margin-bottom: 10px;
-  line-height: 1.3em;
-}
-
-h2 {
-  border-top: 2px solid #e7e7e7;
-  padding-top: 20px;
-}
-
-th {
-  border-bottom: 2px solid #D8B493;
-  text-align: left;
-  padding: 5px 20px 5px 10px;
-}
-
-tr {
-  min-height: 50px;
-}
-
-tr:nth-child(2n) {
-  background: #E7E7E7;
-}
-
-td {
-  padding: 5px 20px 5px 10px;
-}
-
-label {
-  font-weight: bold;
-  min-width: 130px;
-  display: inline-block;
-  transition: 0.4s;
-}
-
-input {
-  padding: 10px;
-  font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  border-radius: 2px;
-  border-color: #E7E7E7;
-  transition: 0.4s;
-}
-
-input[type=text] {
-  margin-left: 7px;
-  width: 300px;
-}
-
-.error {
-  color: rgb(236, 15, 15);
-}
-
-button{
-  margin: 20px;
-}
-
-.alert-container{
+.navbar-inner-container{
   display: flex;
-  right: 40%;
-  position: absolute;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.logo-container{
+  text-decoration: none;
+}
+
+.logo-container svg{
+  width: 10%;
 }
 
 
-.button-container{
+
+.logo-bold{
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 18px;
+  padding: 5px;
+}
+
+.login-container{
+  gap: 10px;
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+}
+
+.login-container button{
+  font-weight: bolder;
+  padding: 18px;
+}
+
+.signup-btn{
+  background-color: #0da2e7;
+  color: white;
+}
+
+.aside-container{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50vh;
+  background-color: #e8f4fb;
+}
+
+.aside-main-container{
+  display: flex;
+  align-items: center;
+  width: 55%;
+}
+
+
+.book-appointment-container{
+  width: 100%;
+}
+
+.h1-tag-aside{
+  color: #0c4a6e;
+  font-weight: bolder;
+  font-size: 45px;
+}
+
+.book-appointment-button{
+  background-color: #0284c7;
+  font-size: 18px;
+  padding: 20px;
+  color: white;
+  border-radius: 10px;
+}
+
+.book-appointment-button:hover{
+  background-color: #0c4a6e;
+}
+
+
+.image-conatiner-aside{
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+}
+
+.image-conatiner-aside img{
+  width: 80%;
+  border-radius: 10px;
+}
+
+.features-h1{
+  color: #075985;
+  font-weight: bolder;
+  font-size: 30px;
+  margin-bottom: 40px;
+}
+
+.features-section{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 50px;
+}
+
+.features-cards{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  gap: 50px;
+  padding: 20px;
+}
+
+.card{
+  padding: 20px;
+}
+
+.grey-text-features{
+  color: #a2a8ad;
+}
+
+.light-blue-features{
+  color: #265e7d;
+}
+
+.card i{
+  margin-bottom: 15px;
+  font-size: 20px;
+  background-color:#e0f2fe ;
+  color: #54acdb;
+  width: 15%;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.signup-now-container{
+  background-color: #0284c7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+  padding: 60px;
+}
+
+.h1-signup{
+  color: white;
+  font-weight: bolder;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.p-signup{
+  color: white;
+  margin-bottom: 20px;
+}
+
+.sign-up-now-btn{
+  width: 10%;
+  padding: 20px;
+  color: #50a5d5;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.footer-container{
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.links-footer{
   display: flex;
   gap: 20px;
+}
+
+.link-footer{
+  text-decoration: none;
+  color: #a2a8ad;
+  transition: all 0.5s;
+}
+
+.link-footer:hover{
+  color: #0284c7;
+
 }
