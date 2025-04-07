@@ -26,18 +26,16 @@ export default function Navbar(){
                     <span className="logo-bold">EasyApptCare</span>
                 </Link>
 
-                <div className="login-container">
+                <div className="login-container-navbar">
                     {isLoggedIn ? (
                         <>
-                            <Link to="">
+                            <Link to="/appointment">
                                 <Button variant="ghost">Dashboard</Button>
                             </Link>
-                            <Link to="">
+                            <Link to="/appointments/new">
                                 <Button variant="ghost">New Appointment</Button>
                             </Link>
-                            <Button
-
-                            >
+                            <Button>
                                 Logout
                             </Button>
                         </>

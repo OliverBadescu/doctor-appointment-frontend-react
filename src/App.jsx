@@ -3,6 +3,10 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "./components/Home.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Footer from './components/Footer.jsx';
+import Login from './components/Login.jsx';
+import Signup from './components/Signup.jsx';
+import Dashboard from './components/Dashboard.jsx';
+import NewAppointment from './components/NewAppointment.jsx';
 
 function App() {
   
@@ -13,7 +17,11 @@ function App() {
         <Navbar/>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/Home" element={<Home />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/appointment" element={<Dashboard />} />
+        <Route path="/appointments/new" element={<NewAppointment />} />
       </Routes>
         <Footer/>
     </Router>
