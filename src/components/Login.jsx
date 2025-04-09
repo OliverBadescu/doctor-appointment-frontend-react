@@ -1,18 +1,30 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import {Button} from "antd";
+import { useState, useContext } from "react";
+import { Link, useNavigate,useLocation } from "react-router-dom";
+import { UserContext } from "../services/state/userContext";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const { handleLogin, loading, errors } = useContext(UserContext);
   const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
+  const location = useLocation();
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     
+    const loginRequest = {
+      email,
+      password
+    };
     
+    const result = await handleLogin(loginRequest);
+    
+    if (result.success) {
+      if (result.role === "ADMIN") {
+        navigate("/admin/appointment");
+      } else {
+        navigate("/appointment");
+      }
+    }
   };
 
   return (
@@ -40,9 +52,22 @@ export default function Login() {
             <div className="welcome-subtitle">
               Sign in to your account to manage your appointments
             </div>
+            {location.state?.message && (
+            <div className="success-message">
+              {location.state.message}
+            </div>
+          )}
           </div>
           
           <div className="form-wrapper">
+            {errors.length > 0 && (
+              <div className="error-message">
+                {errors.map((error, index) => (
+                  <p key={index}>{error}</p>
+                ))}
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="login-form">
               <div className="form-group">
                 <label htmlFor="email" className="form-label">Email</label>
@@ -80,10 +105,10 @@ export default function Login() {
               
               <button 
                 type="submit" 
-                className={`login-button ${isLoading ? 'loading' : ''}`}
-                disabled={isLoading}
+                className={`login-button ${loading ? 'loading' : ''}`}
+                disabled={loading}
               >
-                {isLoading ? "Signing In..." : "Sign In"}
+                {loading ? "Signing In..." : "Sign In"}
               </button>
             </form>
           </div>
@@ -100,4 +125,4 @@ export default function Login() {
       </div>
     </div>
   );
-};
+}

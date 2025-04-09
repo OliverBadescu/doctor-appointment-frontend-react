@@ -7,6 +7,7 @@ import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import NewAppointment from './components/NewAppointment.jsx';
+import { UserProvider } from './services/state/userContext.jsx';
 
 function App() {
   
@@ -14,16 +15,18 @@ function App() {
   return (
     
     <Router>
-        <Navbar/>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/appointment" element={<Dashboard />} />
-        <Route path="/appointments/new" element={<NewAppointment />} />
-      </Routes>
-        <Footer/>
+        <UserProvider>    
+          <Navbar/>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/home" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/appointment" element={<Dashboard />} />
+              <Route path="/appointments/new" element={<NewAppointment />} />
+            </Routes>
+          <Footer/>
+        </UserProvider>
     </Router>
   );
 }

@@ -1,114 +1,173 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { getAllClinic } from '../services/api/clinicService';
+import { getAllDoctors } from '../services/api/doctorService';
+import { createAppointment } from '../services/api/appointmentService';
+import { UserContext } from '../services/state/userContext';
 
 export default function NewAppointment() {
   const navigate = useNavigate();
+  const { user } = useContext(UserContext);
   const [clinics, setClinics] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
   const [selectedClinic, setSelectedClinic] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState("");
+  const [selectedDoctorName, setSelectedDoctorName] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
   
   useEffect(() => {
-    
-    
-    
-    
-    const mockClinics = [
-      {
-        id: "clinic1",
-        name: "City Medical Center",
-        address: "123 Main St, Cityville"
-      },
-      {
-        id: "clinic2",
-        name: "Riverdale Clinic",
-        address: "456 Oak Ave, Riverdale"
-      },
-      {
-        id: "clinic3",
-        name: "Westside Health Center",
-        address: "789 Pine Rd, Westside"
+    async function fetchData() {
+      setIsLoading(true);
+      try {
+
+        const clinicsResponse = await getAllClinic();
+
+        if (clinicsResponse.success) {
+          setClinics(clinicsResponse.body.list);
+        } else {
+          setError("Failed to load clinics: " + clinicsResponse.message);
+        }
+        
+
+        const doctorsResponse = await getAllDoctors();
+        if (doctorsResponse.success) {
+          setDoctors(doctorsResponse.body.list);
+        } else {
+          setError("Failed to load doctors: " + doctorsResponse.message);
+        }
+      } catch (err) {
+        setError("An error occurred while fetching data");
+        console.error(err);
+      } finally {
+        setIsLoading(false);
       }
-    ];
+    }
     
-    
-    const mockDoctors = [
-      {
-        id: "doctor1",
-        name: "Dr. Sarah Johnson",
-        specialty: "General Practitioner",
-        clinicId: "clinic1"
-      },
-      {
-        id: "doctor2",
-        name: "Dr. Robert Williams",
-        specialty: "Cardiologist",
-        clinicId: "clinic1"
-      },
-      {
-        id: "doctor3",
-        name: "Dr. Michael Chen",
-        specialty: "Pediatrician",
-        clinicId: "clinic2"
-      },
-      {
-        id: "doctor4",
-        name: "Dr. Jessica Lee",
-        specialty: "Dermatologist",
-        clinicId: "clinic2"
-      },
-      {
-        id: "doctor5",
-        name: "Dr. David Miller",
-        specialty: "Neurologist",
-        clinicId: "clinic3"
-      }
-    ];
-    
-    setClinics(mockClinics);
-    setDoctors(mockDoctors);
-  }, [navigate]);
+    fetchData();
+  }, []);
   
-  
+
+
   useEffect(() => {
     if (selectedClinic) {
-      const filtered = doctors.filter(doctor => doctor.clinicId === selectedClinic);
+      const filtered = doctors.filter(doctor => doctor.clinic.id == selectedClinic);
+
       setFilteredDoctors(filtered);
       
-      const doctorInClinic = filtered.some(doc => doc.id === selectedDoctor);
+      const doctorInClinic = filtered.some(doc => doc.id == selectedDoctor);
       if (!doctorInClinic) {
         setSelectedDoctor("");
+        setSelectedDoctorName("");
       }
     } else {
       setFilteredDoctors([]);
       setSelectedDoctor("");
+      setSelectedDoctorName("");
     }
   }, [selectedClinic, doctors, selectedDoctor]);
   
-  const handleSubmit = (e) => {
+  const handleDoctorChange = (e) => {
+    const doctorId = e.target.value;
+    setSelectedDoctor(doctorId);
+    
+
+    if (doctorId) {
+      const doctor = doctors.find(doc => doc.id == doctorId);
+
+
+      if (doctor) {
+
+        setSelectedDoctorName(doctor.fullName);
+
+      }
+    } else {
+      setSelectedDoctorName("");
+    }
+  };
+  
+  const calculateEndTime = (startTime) => {
+
+    const [hours, minutes] = startTime.split(':').map(Number);
+    let endHours = hours;
+    let endMinutes = minutes + 30;
+    
+    if (endMinutes >= 60) {
+      endHours += 1;
+      endMinutes -= 60;
+    }
+    
+
+    return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+  };
+  
+  const formatTimeForBackend = (timeString) => {
+
+    const [time, period] = timeString.split(' ');
+    let [hours, minutes] = time.split(':').map(Number);
+    
+    if (period === 'PM' && hours < 12) {
+      hours += 12;
+    } else if (period === 'AM' && hours === 12) {
+      hours = 0;
+    }
+    
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  };
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!selectedClinic || !selectedDoctor || !date || !time) {
-      alert("Please fill all required fields");
+      setError("Please fill all required fields");
       return;
     }
     
     setIsLoading(true);
+    setError("");
     
-    setTimeout(() => {
-      alert("Appointment booked successfully! Your appointment has been scheduled.");
-      navigate("/dashboard");
+    try {
+
+      const formattedTime = formatTimeForBackend(time);
+      
+
+      const startDateTime = `${date} ${formattedTime}`;
+      const endTime = calculateEndTime(formattedTime);
+      const endDateTime = `${date} ${endTime}`;
+      
+
+      const appointmentData = {
+        start: startDateTime,
+        end: endDateTime,
+        doctorName: selectedDoctorName,
+        patientId: user.id
+      };
+      
+      const response = await createAppointment(appointmentData);
+      
+      if (response.success) {
+        alert("Appointment booked successfully!");
+        navigate("/appointment");
+      } else {
+        setError("Failed to book appointment: " + response.message);
+      }
+    } catch (err) {
+      setError("An error occurred while booking your appointment");
+      console.error(err);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
   
   const today = new Date().toISOString().split("T")[0];
+
+  if (isLoading && (!clinics.length || !doctors.length)) {
+    return <div className="loading-container">Loading appointment data...</div>;
+  }
 
   return (
     <div className="appointment-container">
@@ -116,6 +175,12 @@ export default function NewAppointment() {
         <h1 className="appointment-title">Book an Appointment</h1>
         <p className="appointment-subtitle">Schedule your visit with a healthcare professional</p>
       </div>
+      
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
       
       <div className="appointment-card">
         <div className="card-header">
@@ -150,7 +215,7 @@ export default function NewAppointment() {
                   id="doctor" 
                   className="form-select"
                   value={selectedDoctor}
-                  onChange={(e) => setSelectedDoctor(e.target.value)}
+                  onChange={handleDoctorChange}
                   disabled={!selectedClinic}
                 >
                   <option value="">
@@ -158,7 +223,7 @@ export default function NewAppointment() {
                   </option>
                   {filteredDoctors.map((doctor) => (
                     <option key={doctor.id} value={doctor.id}>
-                      {doctor.name} ({doctor.specialty})
+                      {doctor.fullName} ({doctor.specialization})
                     </option>
                   ))}
                 </select>
@@ -214,7 +279,7 @@ export default function NewAppointment() {
               <button
                 type="button"
                 className="cancel-button"
-                onClick={() => navigate("/dashboard")}
+                onClick={() => navigate("/appointment")}
               >
                 Cancel
               </button>

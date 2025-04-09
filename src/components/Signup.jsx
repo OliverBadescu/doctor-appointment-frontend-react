@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { UserContext } from '../services/state/userContext';
 
 export default function Signup() {
   const [formData, setFormData] = useState({
@@ -8,7 +9,8 @@ export default function Signup() {
     password: '',
     confirmPassword: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const { handleRegister, loading, errors } = useContext(UserContext);
+  const navigate = useNavigate();
 
   const { name, email, password, confirmPassword } = formData;
 
@@ -20,10 +22,26 @@ export default function Signup() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     
+
+    if (password !== confirmPassword) {
+      return; 
+    }
+    
+    const registerRequest = {
+      fullName: name,
+      email,
+      password
+    };
+    
+    const success = await handleRegister(registerRequest);
+
+    console.log(success);
+    if (success) {
+      navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
+    }
   };
 
   return (
@@ -54,6 +72,14 @@ export default function Signup() {
           </div>
           
           <div className="card-content">
+            {errors.length > 0 && (
+              <div className="error-message">
+                {errors.map((error, index) => (
+                  <p key={index}>{error}</p>
+                ))}
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="signup-form">
               <div className="form-group">
                 <label htmlFor="name" className="form-label">Full Name</label>
@@ -104,14 +130,17 @@ export default function Signup() {
                   onChange={handleChange}
                   required
                 />
+                {password !== confirmPassword && confirmPassword !== '' && (
+                  <div className="password-mismatch">Passwords do not match</div>
+                )}
               </div>
               
               <button 
                 type="submit" 
-                className={`signup-button ${isLoading ? 'loading' : ''}`}
-                disabled={isLoading}
+                className={`signup-button ${loading ? 'loading' : ''}`}
+                disabled={loading || (password !== confirmPassword && confirmPassword !== '')}
               >
-                {isLoading ? "Creating Account..." : "Create Account"}
+                {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
           </div>

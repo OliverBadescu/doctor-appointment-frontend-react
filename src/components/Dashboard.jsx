@@ -1,45 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-
+import React, { useState, useEffect, useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { UserContext } from '../services/state/userContext';
+import { getAllPatientAppointments } from '../services/api/appointmentService';
 
 export default function Dashboard() {
+  const { user } = useContext(UserContext);
+  const navigate = useNavigate();
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const [userName, setUserName] = useState('John Doe');
-  const [appointments, setAppointments] = useState([
-    {
-      id: 1,
-      doctorName: 'Dr. Sarah Johnson',
-      clinicName: 'Family Health Clinic',
-      reason: 'Annual physical examination',
-      date: '2025-04-15',
-      time: '10:00 AM'
-    },
-    {
-      id: 2,
-      doctorName: 'Dr. Michael Chen',
-      clinicName: 'City Medical Center',
-      reason: 'Follow-up consultation',
-      date: '2025-04-22',
-      time: '2:30 PM'
+  useEffect(() => {
+    if (!user || user.id === 0) {
+      navigate('/login');
+      return;
     }
-  ]);
 
-  const cancelAppointment = (id) => {
-    
-    setAppointments(appointments.filter(appointment => appointment.id !== id));
+    const fetchAppointments = async () => {
+      setLoading(true);
+      try {
+        const response = await getAllPatientAppointments(user.id);
+        if (response.success) {
+          // Expecting appointments to be an array of appointment objects
+          setAppointments(response.body.appointments || []);
+        } else {
+          setError("Failed to load appointments");
+          console.error("Error fetching appointments:", response.message);
+        }
+      } catch (err) {
+        setError("An error occurred while fetching appointments");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, [user, navigate]);
+
+  const cancelAppointment = async (id) => {
+    if (window.confirm("Are you sure you want to cancel this appointment?")) {
+      try {
+        const response = await fetch(`http://www.localhost:8080/appointment/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${user.jwtToken}`
+          }
+        });
+
+        if (response.ok) {
+          setAppointments(appointments.filter(appointment => appointment.id !== id));
+        } else {
+          alert("Failed to cancel appointment. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error canceling appointment:", error);
+        alert("An error occurred. Please try again.");
+      }
+    }
   };
+
+  if (loading) {
+    return <div className="loading">Loading your appointments...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
 
   return (
     <div className="appointment-container">
       <div className="header-section">
         <div className="user-welcome">
-          <h1 className="welcome-title">Welcome, {userName}</h1>
+          <h1 className="welcome-title">Welcome, {user.fullName}</h1>
           <p className="welcome-subtitle">Manage your appointments and health records</p>
         </div>
         <Link to="/appointments/new">
-          <button className="book-button">
-            Book New Appointment
-          </button>
+          <button className="book-button">Book New Appointment</button>
         </Link>
       </div>
       
@@ -82,53 +120,65 @@ export default function Dashboard() {
         
         {appointments.length > 0 ? (
           <div className="appointment-list">
-            {appointments.map((appointment) => (
-              <div key={appointment.id} className="appointment-card">
-                <div className="appointment-layout">
-                  <div className="appointment-details">
-                    <div className="appointment-header">
-                      <div>
-                        <h3 className="doctor-name">{appointment.doctorName}</h3>
-                        <p className="clinic-name">{appointment.clinicName}</p>
+            {appointments.map((appointment) => {
+              
+              const startDate = new Date(appointment.start.replace(" ", "T"));
+              const endDate = new Date(appointment.end.replace(" ", "T"));
+              return (
+                <div key={appointment.id} className="appointment-card">
+                  <div className="appointment-layout">
+                    <div className="appointment-details">
+                      <div className="appointment-header">
+                        <div>
+                          <h3 className="doctor-name">
+                            {appointment.doctor?.fullName || "Unknown Doctor"}
+                          </h3>
+                          <p className="clinic-name">
+                           
+                            Medical Center
+                          </p>
+                        </div>
+                        <div className="appointment-status">
+                          <span className="status-badge">Upcoming</span>
+                        </div>
                       </div>
-                      <div className="appointment-status">
-                        <span className="status-badge">
-                          Upcoming
-                        </span>
+                      <p className="appointment-reason">
+                        {appointment.reason || "No reason provided"}
+                      </p>
+                      <div className="appointment-time-info">
+                        <div className="time-detail">
+                          <p className="detail-label">Date</p>
+                          <p className="detail-value">
+                            {startDate.toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                        <div className="time-detail">
+                          <p className="detail-label">Time</p>
+                          <p className="detail-value">
+                            {startDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - {endDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <p className="appointment-reason">{appointment.reason}</p>
-                    <div className="appointment-time-info">
-                      <div className="time-detail">
-                        <p className="detail-label">Date</p>
-                        <p className="detail-value">
-                          {new Date(appointment.date).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            year: 'numeric'
-                          })}
-                        </p>
-                      </div>
-                      <div className="time-detail">
-                        <p className="detail-label">Time</p>
-                        <p className="detail-value">{appointment.time}</p>
-                      </div>
+                    <div className="appointment-actions">
+                      <button className="action-button reschedule-button">
+                        Reschedule
+                      </button>
+                      <button
+                        className="action-button cancel-button"
+                        onClick={() => cancelAppointment(appointment.id)}
+                      >
+                        Cancel
+                      </button>
                     </div>
-                  </div>
-                  <div className="appointment-actions">
-                    <button className="action-button reschedule-button">
-                      Reschedule
-                    </button>
-                    <button
-                      className="action-button cancel-button"
-                      onClick={() => cancelAppointment(appointment.id)}
-                    >
-                      Cancel
-                    </button>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="empty-appointments">
