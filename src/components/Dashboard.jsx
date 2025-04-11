@@ -92,25 +92,7 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <div className="dashboard-card">
-          <div className="card-header">
-            <div className="card-title">Health Records</div>
-            <div className="card-description">Your medical records</div>
-          </div>
-          <div className="card-content">
-            <div className="stat-value">3</div>
-          </div>
-        </div>
-        
-        <div className="dashboard-card">
-          <div className="card-header">
-            <div className="card-title">Medication Reminders</div>
-            <div className="card-description">Active medication schedules</div>
-          </div>
-          <div className="card-content">
-            <div className="stat-value">2</div>
-          </div>
-        </div>
+    
       </div>
       
       <div className="appointments-section">

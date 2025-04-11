@@ -27,7 +27,6 @@ export default function NewAppointment() {
       setIsLoading(true);
       try {
         const clinicsResponse = await getAllClinic();
-
         if (clinicsResponse.success) {
           setClinics(clinicsResponse.body.list);
         } else {
@@ -82,12 +81,9 @@ export default function NewAppointment() {
         setTime("");
         
         try {
-          // Send the date properly formatted in a JSON object.
-          // The API now returns booked appointments as timesList.
-          const response = await getDoctorAvailability({ date: date }, selectedDoctor);
+          const response = await getDoctorAvailability(date, selectedDoctor);
           
           if (response.success && response.body.timesList) {
-            // Generate available 30-minute slots by subtracting the booked appointments
             const availableSlots = generateAvailableSlots(response.body.timesList);
             setAvailableTimeSlots(availableSlots);
             
@@ -113,59 +109,11 @@ export default function NewAppointment() {
     fetchDoctorAvailability();
   }, [selectedDoctor, date]);
 
-
-  const generateAvailableSlots = (bookedList) => {
-
-    const workStart = "09:00";
-    const workEnd = "17:00";
-
-
-    const booked = bookedList
-      .map(range => {
-        const [start, end] = range.split(' - ');
-        return { start, end };
-      })
-      .sort((a, b) => a.start.localeCompare(b.start));
-
-    const freeIntervals = [];
-
-    if (booked.length === 0) {
-      freeIntervals.push({ start: workStart, end: workEnd });
-    } else {
-      if (workStart < booked[0].start) {
-        freeIntervals.push({ start: workStart, end: booked[0].start });
-      }
-
-      for (let i = 0; i < booked.length - 1; i++) {
-        if (booked[i].end < booked[i + 1].start) {
-          freeIntervals.push({ start: booked[i].end, end: booked[i + 1].start });
-        }
-      }
-
-      if (booked[booked.length - 1].end < workEnd) {
-        freeIntervals.push({ start: booked[booked.length - 1].end, end: workEnd });
-      }
-    }
-
-    const availableSlots = [];
-    freeIntervals.forEach(interval => {
-      let current = interval.start;
-      while (current < interval.end) {
-        const [hours, minutes] = current.split(':').map(Number);
-        let nextHours = hours;
-        let nextMinutes = minutes + 30;
-        if (nextMinutes >= 60) {
-          nextHours++;
-          nextMinutes -= 60;
-        }
-        const next = `${String(nextHours).padStart(2, '0')}:${String(nextMinutes).padStart(2, '0')}`;
-        if (next <= interval.end) {
-          availableSlots.push(convertTo12Hour(current));
-        }
-        current = next;
-      }
+  const generateAvailableSlots = (timesList) => {
+    return timesList.map(range => {
+      const [start, end] = range.split(" - ");
+      return `${convertTo12Hour(start)} - ${convertTo12Hour(end)}`;
     });
-    return availableSlots;
   };
 
   const convertTo12Hour = (time24) => {
@@ -218,7 +166,6 @@ export default function NewAppointment() {
 
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
-    
     if (isWeekend(selectedDate)) {
       return; 
     }
@@ -229,13 +176,14 @@ export default function NewAppointment() {
   };
 
   const isWeekend = (dateString) => {
-    const date = new Date(dateString);
-    const day = date.getDay();
+    const dateObj = new Date(dateString);
+    const day = dateObj.getDay();
     return day === 0 || day === 6; 
   };
 
   const formatTimeForBackend = (timeString) => {
-    return convertTo24Hour(timeString);
+    const startTime12 = timeString.split(' - ')[0];
+    return convertTo24Hour(startTime12);
   };
 
   const calculateEndTime = (startTime) => {
@@ -302,12 +250,10 @@ export default function NewAppointment() {
       .weekend-disabled input[type="date"]::-webkit-calendar-picker-indicator {
         position: relative;
       }
-
       .form-input[type="date"]:disabled {
         background-color: #f5f5f5;
         cursor: not-allowed;
       }
-
       .time-loading {
         opacity: 0.6;
       }

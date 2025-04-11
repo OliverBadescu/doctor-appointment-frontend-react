@@ -44,6 +44,6 @@ function api(path, method = 'GET', body = null) {
   }
 
   export function getDoctorAvailability(date, doctorId){
-    const data = { date: date };
+    const data = { getDate: date };
     return request(`available/${doctorId}`, 'POST', data);
   }
