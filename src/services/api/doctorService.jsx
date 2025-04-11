@@ -42,3 +42,8 @@ function api(path, method = 'GET', body = null) {
   export function getAllDoctors(){
     return request('getAllDoctors', 'GET');
   }
+
+  export function getDoctorAvailability(date, doctorId){
+    const data = { date: date };
+    return request(`available/${doctorId}`, 'POST', data);
+  }

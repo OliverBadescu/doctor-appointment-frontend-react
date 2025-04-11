@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAllClinic } from '../services/api/clinicService';
-import { getAllDoctors } from '../services/api/doctorService';
+import { getAllDoctors, getDoctorAvailability } from '../services/api/doctorService';
 import { createAppointment } from '../services/api/appointmentService';
 import { UserContext } from '../services/state/userContext';
 
@@ -18,13 +18,14 @@ export default function NewAppointment() {
   const [time, setTime] = useState("");
   const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [error, setError] = useState("");
-  
+  const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true);
       try {
-
         const clinicsResponse = await getAllClinic();
 
         if (clinicsResponse.success) {
@@ -33,7 +34,6 @@ export default function NewAppointment() {
           setError("Failed to load clinics: " + clinicsResponse.message);
         }
         
-
         const doctorsResponse = await getAllDoctors();
         if (doctorsResponse.success) {
           setDoctors(doctorsResponse.body.list);
@@ -50,48 +50,195 @@ export default function NewAppointment() {
     
     fetchData();
   }, []);
-  
-
 
   useEffect(() => {
     if (selectedClinic) {
       const filtered = doctors.filter(doctor => doctor.clinic.id == selectedClinic);
-
       setFilteredDoctors(filtered);
       
       const doctorInClinic = filtered.some(doc => doc.id == selectedDoctor);
       if (!doctorInClinic) {
         setSelectedDoctor("");
         setSelectedDoctorName("");
+        setDate("");
+        setTime("");
+        setAvailableTimeSlots([]);
       }
     } else {
       setFilteredDoctors([]);
       setSelectedDoctor("");
       setSelectedDoctorName("");
+      setDate("");
+      setTime("");
+      setAvailableTimeSlots([]);
     }
   }, [selectedClinic, doctors, selectedDoctor]);
-  
+
+  useEffect(() => {
+    async function fetchDoctorAvailability() {
+      if (selectedDoctor && date) {
+        setAvailabilityLoading(true);
+        setAvailableTimeSlots([]);
+        setTime("");
+        
+        try {
+          // Send the date properly formatted in a JSON object.
+          // The API now returns booked appointments as timesList.
+          const response = await getDoctorAvailability({ date: date }, selectedDoctor);
+          
+          if (response.success && response.body.timesList) {
+            // Generate available 30-minute slots by subtracting the booked appointments
+            const availableSlots = generateAvailableSlots(response.body.timesList);
+            setAvailableTimeSlots(availableSlots);
+            
+            if (availableSlots.length === 0) {
+              setError("No available appointment slots for this date");
+            } else {
+              setError("");
+            }
+          } else {
+            setError("Failed to load doctor's availability: " + (response.message || "Unknown error"));
+            setAvailableTimeSlots([]);
+          }
+        } catch (err) {
+          setError("An error occurred while fetching doctor's availability");
+          console.error(err);
+          setAvailableTimeSlots([]);
+        } finally {
+          setAvailabilityLoading(false);
+        }
+      }
+    }
+    
+    fetchDoctorAvailability();
+  }, [selectedDoctor, date]);
+
+
+  const generateAvailableSlots = (bookedList) => {
+
+    const workStart = "09:00";
+    const workEnd = "17:00";
+
+
+    const booked = bookedList
+      .map(range => {
+        const [start, end] = range.split(' - ');
+        return { start, end };
+      })
+      .sort((a, b) => a.start.localeCompare(b.start));
+
+    const freeIntervals = [];
+
+    if (booked.length === 0) {
+      freeIntervals.push({ start: workStart, end: workEnd });
+    } else {
+      if (workStart < booked[0].start) {
+        freeIntervals.push({ start: workStart, end: booked[0].start });
+      }
+
+      for (let i = 0; i < booked.length - 1; i++) {
+        if (booked[i].end < booked[i + 1].start) {
+          freeIntervals.push({ start: booked[i].end, end: booked[i + 1].start });
+        }
+      }
+
+      if (booked[booked.length - 1].end < workEnd) {
+        freeIntervals.push({ start: booked[booked.length - 1].end, end: workEnd });
+      }
+    }
+
+    const availableSlots = [];
+    freeIntervals.forEach(interval => {
+      let current = interval.start;
+      while (current < interval.end) {
+        const [hours, minutes] = current.split(':').map(Number);
+        let nextHours = hours;
+        let nextMinutes = minutes + 30;
+        if (nextMinutes >= 60) {
+          nextHours++;
+          nextMinutes -= 60;
+        }
+        const next = `${String(nextHours).padStart(2, '0')}:${String(nextMinutes).padStart(2, '0')}`;
+        if (next <= interval.end) {
+          availableSlots.push(convertTo12Hour(current));
+        }
+        current = next;
+      }
+    });
+    return availableSlots;
+  };
+
+  const convertTo12Hour = (time24) => {
+    const [hours, minutes] = time24.split(':').map(Number);
+    let period = 'AM';
+    let displayHours = hours;
+    
+    if (hours >= 12) {
+      period = 'PM';
+      displayHours = hours === 12 ? 12 : hours - 12;
+    }
+    displayHours = displayHours === 0 ? 12 : displayHours;
+    
+    return `${String(displayHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')} ${period}`;
+  };
+
+  const convertTo24Hour = (time) => {
+    if (time.includes('AM') || time.includes('PM')) {
+      const [timePart, period] = time.split(' ');
+      let [hours, minutes] = timePart.split(':').map(Number);
+      
+      if (period === 'PM' && hours < 12) {
+        hours += 12;
+      } else if (period === 'AM' && hours === 12) {
+        hours = 0;
+      }
+      
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    }
+    
+    return time;
+  };
+
   const handleDoctorChange = (e) => {
     const doctorId = e.target.value;
     setSelectedDoctor(doctorId);
+    setDate("");
+    setTime("");
+    setAvailableTimeSlots([]);
     
-
     if (doctorId) {
       const doctor = doctors.find(doc => doc.id == doctorId);
-
-
       if (doctor) {
-
         setSelectedDoctorName(doctor.fullName);
-
       }
     } else {
       setSelectedDoctorName("");
     }
   };
-  
-  const calculateEndTime = (startTime) => {
 
+  const handleDateChange = (e) => {
+    const selectedDate = e.target.value;
+    
+    if (isWeekend(selectedDate)) {
+      return; 
+    }
+    
+    setDate(selectedDate);
+    setTime("");
+    setAvailableTimeSlots([]);
+  };
+
+  const isWeekend = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDay();
+    return day === 0 || day === 6; 
+  };
+
+  const formatTimeForBackend = (timeString) => {
+    return convertTo24Hour(timeString);
+  };
+
+  const calculateEndTime = (startTime) => {
     const [hours, minutes] = startTime.split(':').map(Number);
     let endHours = hours;
     let endMinutes = minutes + 30;
@@ -101,28 +248,15 @@ export default function NewAppointment() {
       endMinutes -= 60;
     }
     
-
-    return `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+    return `${endHours.toString().padStart(2, '0')}:${endMinutes
+      .toString()
+      .padStart(2, '0')}`;
   };
-  
-  const formatTimeForBackend = (timeString) => {
 
-    const [time, period] = timeString.split(' ');
-    let [hours, minutes] = time.split(':').map(Number);
-    
-    if (period === 'PM' && hours < 12) {
-      hours += 12;
-    } else if (period === 'AM' && hours === 12) {
-      hours = 0;
-    }
-    
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  };
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!selectedClinic || !selectedDoctor || !date || !time) {
+    if (!selectedClinic || !selectedDoctor || !date || !time || !reason) {
       setError("Please fill all required fields");
       return;
     }
@@ -131,20 +265,17 @@ export default function NewAppointment() {
     setError("");
     
     try {
-
       const formattedTime = formatTimeForBackend(time);
-      
-
       const startDateTime = `${date} ${formattedTime}`;
       const endTime = calculateEndTime(formattedTime);
       const endDateTime = `${date} ${endTime}`;
       
-
       const appointmentData = {
         start: startDateTime,
         end: endDateTime,
         doctorName: selectedDoctorName,
-        patientId: user.id
+        patientId: user.id,
+        reason: reason
       };
       
       const response = await createAppointment(appointmentData);
@@ -164,6 +295,29 @@ export default function NewAppointment() {
   };
   
   const today = new Date().toISOString().split("T")[0];
+
+  useEffect(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      .weekend-disabled input[type="date"]::-webkit-calendar-picker-indicator {
+        position: relative;
+      }
+
+      .form-input[type="date"]:disabled {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+      }
+
+      .time-loading {
+        opacity: 0.6;
+      }
+    `;
+    document.head.appendChild(styleElement);
+    
+    return () => {
+      document.head.removeChild(styleElement);
+    };
+  }, []);
 
   if (isLoading && (!clinics.length || !doctors.length)) {
     return <div className="loading-container">Loading appointment data...</div>;
@@ -230,35 +384,49 @@ export default function NewAppointment() {
               </div>
               
               <div className="date-time-container">
-                <div className="form-group">
+                <div className="form-group weekend-disabled">
                   <label htmlFor="date" className="form-label">Date</label>
                   <input
                     id="date"
                     type="date"
                     className="form-input"
                     value={date}
-                    onChange={(e) => setDate(e.target.value)}
+                    onChange={handleDateChange}
                     min={today}
                     required
+                    disabled={!selectedDoctor}
                   />
+                  {selectedDoctor && (
+                    <small className="form-text text-muted">
+                      Weekends are not available for appointments
+                    </small>
+                  )}
                 </div>
                 <div className="form-group">
                   <label htmlFor="time" className="form-label">Time</label>
                   <select 
                     id="time" 
-                    className="form-select"
+                    className={`form-select ${availabilityLoading ? 'time-loading' : ''}`}
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
+                    disabled={!date || availabilityLoading || availableTimeSlots.length === 0}
                   >
-                    <option value="">Select a time</option>
-                    <option value="09:00 AM">09:00 AM</option>
-                    <option value="10:00 AM">10:00 AM</option>
-                    <option value="11:00 AM">11:00 AM</option>
-                    <option value="01:00 PM">01:00 PM</option>
-                    <option value="02:00 PM">02:00 PM</option>
-                    <option value="03:00 PM">03:00 PM</option>
-                    <option value="04:00 PM">04:00 PM</option>
+                    <option value="">
+                      {!date ? "First select a date" : 
+                       availabilityLoading ? "Loading available times..." :
+                       availableTimeSlots.length === 0 ? "No available slots" : "Select a time"}
+                    </option>
+                    {availableTimeSlots.map((slot) => (
+                      <option key={slot} value={slot}>
+                        {slot}
+                      </option>
+                    ))}
                   </select>
+                  {date && availableTimeSlots.length === 0 && !availabilityLoading && (
+                    <small className="form-text text-muted">
+                      No available appointment slots for this date
+                    </small>
+                  )}
                 </div>
               </div>
               
@@ -286,7 +454,7 @@ export default function NewAppointment() {
               <button 
                 type="submit" 
                 className="submit-button"
-                disabled={isLoading}
+                disabled={isLoading || !selectedClinic || !selectedDoctor || !date || !time}
               >
                 {isLoading ? "Booking Appointment..." : "Book Appointment"}
               </button>
