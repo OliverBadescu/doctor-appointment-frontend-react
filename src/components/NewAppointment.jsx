@@ -266,33 +266,33 @@ export default function NewAppointment() {
   }, []);
 
   if (isLoading && (!clinics.length || !doctors.length)) {
-    return <div className="loading-container">Loading appointment data...</div>;
+    return <div className="loading-container animate-fadeIn">Loading appointment data...</div>;
   }
 
   return (
-    <div className="appointment-container">
-      <div className="appointment-header">
+    <div className="appointment-container animate-fadeIn">
+      <div className="appointment-header animate-slideUp">
         <h1 className="appointment-title">Book an Appointment</h1>
         <p className="appointment-subtitle">Schedule your visit with a healthcare professional</p>
       </div>
       
       {error && (
-        <div className="error-message">
+        <div className="error-message animate-fadeIn">
           {error}
         </div>
       )}
       
-      <div className="appointment-card">
-        <div className="card-header">
+      <div className="appointment-card animate-slideUp">
+        <div className="card-header animate-fadeIn">
           <h2 className="card-title">Appointment Details</h2>
           <p className="card-description">
             Fill in the information below to schedule your appointment
           </p>
         </div>
-        <div className="card-content">
+        <div className="card-content animate-fadeIn delay-100">
           <form onSubmit={handleSubmit} className="appointment-form">
-            <div className="form-fields">
-              <div className="form-group">
+            <div className="form-fields animate-fadeIn delay-200">
+              <div className="form-group animate-slideUp delay-100">
                 <label htmlFor="clinic" className="form-label">Select Clinic</label>
                 <select 
                   id="clinic" 
@@ -309,7 +309,7 @@ export default function NewAppointment() {
                 </select>
               </div>
               
-              <div className="form-group">
+              <div className="form-group animate-slideUp delay-200">
                 <label htmlFor="doctor" className="form-label">Select Doctor</label>
                 <select 
                   id="doctor" 
@@ -330,7 +330,7 @@ export default function NewAppointment() {
               </div>
               
               <div className="date-time-container">
-                <div className="form-group weekend-disabled">
+                <div className="form-group weekend-disabled animate-slideUp delay-300">
                   <label htmlFor="date" className="form-label">Date</label>
                   <input
                     id="date"
@@ -343,12 +343,12 @@ export default function NewAppointment() {
                     disabled={!selectedDoctor}
                   />
                   {selectedDoctor && (
-                    <small className="form-text text-muted">
+                    <small className="form-text text-muted animate-fadeIn">
                       Weekends are not available for appointments
                     </small>
                   )}
                 </div>
-                <div className="form-group">
+                <div className="form-group animate-slideUp delay-400">
                   <label htmlFor="time" className="form-label">Time</label>
                   <select 
                     id="time" 
@@ -369,14 +369,14 @@ export default function NewAppointment() {
                     ))}
                   </select>
                   {date && availableTimeSlots.length === 0 && !availabilityLoading && (
-                    <small className="form-text text-muted">
+                    <small className="form-text text-muted animate-fadeIn">
                       No available appointment slots for this date
                     </small>
                   )}
                 </div>
               </div>
               
-              <div className="form-group">
+              <div className="form-group animate-slideUp delay-500">
                 <label htmlFor="reason" className="form-label">Reason for Visit</label>
                 <textarea
                   id="reason"
@@ -389,7 +389,7 @@ export default function NewAppointment() {
               </div>
             </div>
             
-            <div className="form-actions">
+            <div className="form-actions animate-fadeIn delay-600">
               <button
                 type="button"
                 className="cancel-button"

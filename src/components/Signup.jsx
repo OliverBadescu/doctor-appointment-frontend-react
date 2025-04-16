@@ -25,7 +25,6 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-
     if (password !== confirmPassword) {
       return; 
     }
@@ -38,7 +37,6 @@ export default function Signup() {
     
     const success = await handleRegister(registerRequest);
 
-    console.log(success);
     if (success) {
       navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
     }
@@ -56,24 +54,24 @@ export default function Signup() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="logo-icon"
+            className="logo-icon animate-fadeIn"
           >
             <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
           </svg>
-          <span className="logo-text">EasyApptCare</span>
+          <span className="logo-text animate-fadeIn" style={{ animationDelay: "100ms" }}>EasyApptCare</span>
         </Link>
         
         <div className="form-card">
           <div className="card-header">
-            <div className="card-title">Create an Account</div>
-            <div className="card-description">
+            <div className="card-title animate-fadeIn">Create an Account</div>
+            <div className="card-description animate-fadeIn" style={{ animationDelay: "100ms" }}>
               Sign up to start booking your medical appointments
             </div>
           </div>
           
           <div className="card-content">
             {errors.length > 0 && (
-              <div className="error-message">
+              <div className="error-message animate-fadeIn">
                 {errors.map((error, index) => (
                   <p key={index}>{error}</p>
                 ))}
@@ -81,7 +79,7 @@ export default function Signup() {
             )}
             
             <form onSubmit={handleSubmit} className="signup-form">
-              <div className="form-group">
+              <div className="form-group animate-slideUp">
                 <label htmlFor="name" className="form-label">Full Name</label>
                 <input
                   id="name"
@@ -93,7 +91,7 @@ export default function Signup() {
                 />
               </div>
               
-              <div className="form-group">
+              <div className="form-group animate-slideUp" style={{ animationDelay: "100ms" }}>
                 <label htmlFor="email" className="form-label">Email</label>
                 <input
                   id="email"
@@ -106,7 +104,7 @@ export default function Signup() {
                 />
               </div>
               
-              <div className="form-group">
+              <div className="form-group animate-slideUp" style={{ animationDelay: "200ms" }}>
                 <label htmlFor="password" className="form-label">Password</label>
                 <input
                   id="password"
@@ -119,7 +117,7 @@ export default function Signup() {
                 />
               </div>
               
-              <div className="form-group">
+              <div className="form-group animate-slideUp" style={{ animationDelay: "300ms" }}>
                 <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
                 <input
                   id="confirmPassword"
@@ -131,13 +129,14 @@ export default function Signup() {
                   required
                 />
                 {password !== confirmPassword && confirmPassword !== '' && (
-                  <div className="password-mismatch">Passwords do not match</div>
+                  <div className="password-mismatch animate-fadeIn">Passwords do not match</div>
                 )}
               </div>
               
               <button 
                 type="submit" 
-                className={`signup-button ${loading ? 'loading' : ''}`}
+                className={`signup-button ${loading ? 'loading' : ''} animate-fadeIn`}
+                style={{ animationDelay: "400ms" }}
                 disabled={loading || (password !== confirmPassword && confirmPassword !== '')}
               >
                 {loading ? "Creating Account..." : "Create Account"}
@@ -145,7 +144,7 @@ export default function Signup() {
             </form>
           </div>
           
-          <div className="card-footer">
+          <div className="card-footer animate-fadeIn" style={{ animationDelay: "500ms" }}>
             <p className="login-prompt">
               Already have an account?{" "}
               <Link to="/login" className="login-link">

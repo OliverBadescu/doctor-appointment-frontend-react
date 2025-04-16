@@ -526,8 +526,8 @@
 .dashboard-cards {
   display: flex;
   text-align: center;
-  justify-content: center;
-  align-items: center;
+  justify-content: start;
+  align-items: start;
 }
 
 @media (min-width: 768px) {
