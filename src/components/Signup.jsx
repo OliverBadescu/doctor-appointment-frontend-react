@@ -58,13 +58,13 @@ export default function Signup() {
           >
             <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
           </svg>
-          <span className="logo-text animate-fadeIn" style={{ animationDelay: "100ms" }}>EasyApptCare</span>
+          <span className="logo-text animate-fadeIn" >EasyApptCare</span>
         </Link>
         
         <div className="form-card">
           <div className="card-header">
             <div className="card-title animate-fadeIn">Create an Account</div>
-            <div className="card-description animate-fadeIn" style={{ animationDelay: "100ms" }}>
+            <div className="card-description animate-fadeIn" >
               Sign up to start booking your medical appointments
             </div>
           </div>
@@ -91,7 +91,7 @@ export default function Signup() {
                 />
               </div>
               
-              <div className="form-group animate-slideUp" style={{ animationDelay: "100ms" }}>
+              <div className="form-group animate-slideUp" >
                 <label htmlFor="email" className="form-label">Email</label>
                 <input
                   id="email"
@@ -104,7 +104,7 @@ export default function Signup() {
                 />
               </div>
               
-              <div className="form-group animate-slideUp" style={{ animationDelay: "200ms" }}>
+              <div className="form-group animate-slideUp" >
                 <label htmlFor="password" className="form-label">Password</label>
                 <input
                   id="password"
@@ -117,7 +117,7 @@ export default function Signup() {
                 />
               </div>
               
-              <div className="form-group animate-slideUp" style={{ animationDelay: "300ms" }}>
+              <div className="form-group animate-slideUp" >
                 <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
                 <input
                   id="confirmPassword"
@@ -136,7 +136,7 @@ export default function Signup() {
               <button 
                 type="submit" 
                 className={`signup-button ${loading ? 'loading' : ''} animate-fadeIn`}
-                style={{ animationDelay: "400ms" }}
+              
                 disabled={loading || (password !== confirmPassword && confirmPassword !== '')}
               >
                 {loading ? "Creating Account..." : "Create Account"}
@@ -144,7 +144,7 @@ export default function Signup() {
             </form>
           </div>
           
-          <div className="card-footer animate-fadeIn" style={{ animationDelay: "500ms" }}>
+          <div className="card-footer animate-fadeIn" >
             <p className="login-prompt">
               Already have an account?{" "}
               <Link to="/login" className="login-link">

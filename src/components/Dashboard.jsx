@@ -111,12 +111,12 @@ export default function Dashboard() {
             {appointments.map((appointment, index) => {
               const startDate = new Date(appointment.start.replace(" ", "T"));
               const endDate = new Date(appointment.end.replace(" ", "T"));
-              const delayClass = `delay-${300 + (index * 50)}`;
+              
   
               return (
                 <div 
                   key={appointment.id} 
-                  className={`appointment-card animate-slideUp ${delayClass}`}
+                  className={`appointment-card animate-slideUp`}
                 >
                   <div className="appointment-layout">
                     <div className="appointment-details">
