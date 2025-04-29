@@ -52,17 +52,17 @@ function api(path, method = 'GET', body = null) {
     return request('getTotalDoctors', 'GET');
   }
 
-  export function createDoctor(){
-
-
-  }
-
-  export function deleteDoctor(){
-
+  export function createDoctor(data){
+    return request('addDoctor', 'POST', data);
 
   }
 
-  export function updateDoctor(){
+  export function deleteDoctor(id){ 
+    return request(`deleteDoctor/${id}`, 'DELETE')
 
+  }
+
+  export function updateDoctor(id, data){
+    return request(`updateDoctor/${id}`, 'PUT', data);
     
   }

@@ -48,15 +48,24 @@ function api(path, method = 'GET', body = null) {
       return request('getTotalClinics', 'GET');
     }
 
-    export function createClinic(request){
-      return request('createClinic', 'POST', request);
+    export function createClinic(data){
+      return request('createClinic', 'POST', data);
     }
 
+    
     export function deleteClinic(id){
-      return request(`deleteClinic/${id}}`, 'DELETE');
+      
+      const intId = parseInt(id, 10);
+      
+      
+      if (isNaN(intId)) {
+        return Promise.reject(new Error('Invalid clinic ID'));
+      }
+      
+      return request(`deleteClinic/${intId}`, 'DELETE');
     }
 
-    export function updateClinic(id, request){
-      return request(`updateClinic${id}`, 'PUT');
+    export function updateClinic(id, data){
+      return request(`updateClinic/${id}`, 'PUT', data);
 
     }

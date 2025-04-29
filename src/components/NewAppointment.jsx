@@ -4,6 +4,17 @@ import { getAllClinic } from '../services/api/clinicService';
 import { getAllDoctors, getDoctorAvailability } from '../services/api/doctorService';
 import { createAppointment } from '../services/api/appointmentService';
 import { UserContext } from '../services/state/userContext';
+import { 
+  Dialog, 
+  DialogActions, 
+  DialogContent, 
+  DialogContentText, 
+  DialogTitle,
+  Button,
+  CircularProgress,
+  Fade
+} from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 
 export default function NewAppointment() {
   const navigate = useNavigate();
@@ -21,6 +32,10 @@ export default function NewAppointment() {
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [error, setError] = useState("");
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+  
+  // Success modal state
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [appointmentDetails, setAppointmentDetails] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -201,6 +216,11 @@ export default function NewAppointment() {
       .padStart(2, '0')}`;
   };
 
+  const formatDate = (dateString) => {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -229,8 +249,16 @@ export default function NewAppointment() {
       const response = await createAppointment(appointmentData);
       
       if (response.success) {
-        alert("Appointment booked successfully!");
-        navigate("/appointment");
+        // Store appointment details for display in success modal
+        setAppointmentDetails({
+          doctor: selectedDoctorName,
+          date: formatDate(date),
+          time: time,
+          clinic: clinics.find(c => c.id == selectedClinic)?.name || "Selected Clinic"
+        });
+        
+        // Show success modal instead of alert
+        setSuccessDialogOpen(true);
       } else {
         setError("Failed to book appointment: " + response.message);
       }
@@ -240,6 +268,11 @@ export default function NewAppointment() {
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const handleSuccessClose = () => {
+    setSuccessDialogOpen(false);
+    navigate("/appointment");
   };
   
   const today = new Date().toISOString().split("T")[0];
@@ -256,6 +289,34 @@ export default function NewAppointment() {
       }
       .time-loading {
         opacity: 0.6;
+      }
+      .success-icon {
+        font-size: 64px;
+        color: #4caf50;
+        margin-bottom: 16px;
+      }
+      .success-dialog-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 24px;
+        text-align: center;
+      }
+      .appointment-details {
+        margin: 16px 0;
+        padding: 16px;
+        background-color: #f5f9ff;
+        border-radius: 8px;
+        width: 100%;
+        text-align: left;
+      }
+      .detail-row {
+        display: flex;
+        margin-bottom: 8px;
+      }
+      .detail-label {
+        font-weight: 500;
+        width: 100px;
       }
     `;
     document.head.appendChild(styleElement);
@@ -402,12 +463,72 @@ export default function NewAppointment() {
                 className="submit-button"
                 disabled={isLoading || !selectedClinic || !selectedDoctor || !date || !time}
               >
-                {isLoading ? "Booking Appointment..." : "Book Appointment"}
+                {isLoading ? (
+                  <>
+                    <CircularProgress size={20} color="inherit" style={{ marginRight: '8px' }} />
+                    Booking Appointment...
+                  </>
+                ) : "Book Appointment"}
               </button>
             </div>
           </form>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <Dialog
+        open={successDialogOpen}
+        onClose={handleSuccessClose}
+        aria-labelledby="appointment-success-dialog"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="appointment-success-dialog" sx={{ textAlign: 'center', pb: 0 }}>
+          Appointment Booked Successfully!
+        </DialogTitle>
+        
+        <DialogContent className="success-dialog-content">
+          <Fade in={successDialogOpen}>
+            <CheckCircleIcon className="success-icon" />
+          </Fade>
+          
+          <DialogContentText>
+            Your appointment has been successfully scheduled. You can view all your appointments in the appointments section.
+          </DialogContentText>
+          
+          {appointmentDetails && (
+            <div className="appointment-details">
+              <div className="detail-row">
+                <span className="detail-label">Doctor:</span>
+                <span>{appointmentDetails.doctor}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Clinic:</span>
+                <span>{appointmentDetails.clinic}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Date:</span>
+                <span>{appointmentDetails.date}</span>
+              </div>
+              <div className="detail-row">
+                <span className="detail-label">Time:</span>
+                <span>{appointmentDetails.time}</span>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+        
+        <DialogActions sx={{ justifyContent: 'center', pb: 3 }}>
+          <Button 
+            onClick={handleSuccessClose} 
+            variant="contained" 
+            color="primary"
+            sx={{ minWidth: '150px' }}
+          >
+            Go to My Appointments
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }
