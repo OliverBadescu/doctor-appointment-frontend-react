@@ -69,3 +69,7 @@ export function deletePatientAppointment(patientId, appointmentId) {
 export function getDoctorAppointments(doctorId) {
   return request(`doctor/${doctorId}`, 'GET');
 }
+
+export function getTotalAppointments(){
+  return request('getTotalAppointments', 'GET');
+}

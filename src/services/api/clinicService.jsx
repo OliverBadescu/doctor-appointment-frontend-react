@@ -42,3 +42,21 @@ function api(path, method = 'GET', body = null) {
     export function getAllClinic(){
       return request('getAllClinics', 'GET');
     }
+
+    export function getTotalClinics(){
+
+      return request('getTotalClinics', 'GET');
+    }
+
+    export function createClinic(request){
+      return request('createClinic', 'POST', request);
+    }
+
+    export function deleteClinic(id){
+      return request(`deleteClinic/${id}}`, 'DELETE');
+    }
+
+    export function updateClinic(id, request){
+      return request(`updateClinic${id}`, 'PUT');
+
+    }

@@ -47,3 +47,22 @@ function api(path, method = 'GET', body = null) {
     const data = { getDate: date };
     return request(`available/${doctorId}`, 'POST', data);
   }
+
+  export function getTotalDoctors(){
+    return request('getTotalDoctors', 'GET');
+  }
+
+  export function createDoctor(){
+
+
+  }
+
+  export function deleteDoctor(){
+
+
+  }
+
+  export function updateDoctor(){
+
+    
+  }

@@ -21,7 +21,7 @@ export default function Login() {
     
     if (result.success) {
       if (result.role === "ADMIN") {
-        navigate("/admin/appointment");
+        navigate("/admin/home");
       } else {
         navigate("/appointment");
       }

@@ -999,3 +999,12 @@
   background-color: #fecaca;
 }
 
+.footer-none{
+  display: none;
+}
+.admin-page-main-container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
