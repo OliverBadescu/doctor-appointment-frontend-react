@@ -19,6 +19,7 @@ import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Close as CloseIcon,
+  Warning as WarningIcon,
 } from '@mui/icons-material';
 
 import {
@@ -32,6 +33,8 @@ export default function ClinicsPageAdmin() {
   const [clinics, setClinics] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [clinicToDelete, setClinicToDelete] = useState(null);
   const [editingClinic, setEditingClinic] = useState(null);
   const [formValues, setFormValues] = useState({ name: '', address: '' });
 
@@ -54,17 +57,31 @@ export default function ClinicsPageAdmin() {
     setFormValues({ name: '', address: '' });
     setOpenDialog(true);
   };
+  
   const handleOpenEdit = (clinic) => () => {
     setEditingClinic(clinic);
     setFormValues({ name: clinic.name, address: clinic.address });
     setOpenDialog(true);
   };
+  
   const handleClose = () => setOpenDialog(false);
 
-  const handleDelete = (id) => async () => {
-    if (!window.confirm('Delete this clinic?')) return;
-    await deleteClinic(id);
-    fetchClinics();
+  const openDeleteDialog = (id, name) => () => {
+    setClinicToDelete({ id, name });
+    setDeleteDialogOpen(true);
+  };
+  
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setClinicToDelete(null);
+  };
+  
+  const confirmDelete = async () => {
+    if (clinicToDelete) {
+      await deleteClinic(clinicToDelete.id);
+      closeDeleteDialog();
+      fetchClinics();
+    }
   };
 
   const handleSubmit = async () => {
@@ -88,7 +105,7 @@ export default function ClinicsPageAdmin() {
       width: 120,
       getActions: (params) => [
         <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={handleOpenEdit(params.row)} />,
-        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={handleDelete(params.id)} showInMenu />,
+        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={openDeleteDialog(params.row.id, params.row.name)} showInMenu />,
       ],
     },
   ];
@@ -148,6 +165,24 @@ export default function ClinicsPageAdmin() {
           <Button onClick={handleClose}>Cancel</Button>
           <Button onClick={handleSubmit} variant="contained">
             {editingClinic ? 'Save Changes' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+
+      <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog} maxWidth="sm">
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+          <WarningIcon color="warning" sx={{ mr: 1 }} /> Confirm Deletion
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete clinic "{clinicToDelete?.name}"? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteDialog}>Cancel</Button>
+          <Button onClick={confirmDelete} variant="contained" color="error">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>

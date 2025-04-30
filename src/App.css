@@ -1008,3 +1008,7 @@
   align-items: center;
   height: 50vh;
 }
+
+#clinic-select-label{
+  width: 100%;
+}

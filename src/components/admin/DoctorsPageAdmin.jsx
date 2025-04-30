@@ -5,7 +5,7 @@ import {
   FormControl, InputLabel, Select, MenuItem, FormHelperText
 } from '@mui/material';
 import { DataGrid, GridActionsCellItem } from '@mui/x-data-grid';
-import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Close as CloseIcon, Warning as WarningIcon } from '@mui/icons-material';
 import {
   getAllDoctors,
   createDoctor,
@@ -19,6 +19,8 @@ export default function DoctorsPageAdmin() {
   const [clinics, setClinics] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [doctorToDelete, setDoctorToDelete] = useState(null);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({
     fullName: '',
@@ -39,8 +41,19 @@ export default function DoctorsPageAdmin() {
         getAllClinic()
       ]);
 
-      setRows(doctorsRes.body.list || []);
+      
+      const clinicMap = {};
+      (clinicsRes.body.list || []).forEach(clinic => {
+        clinicMap[clinic.id] = clinic.name;
+      });
 
+      
+      const doctorsWithClinicNames = (doctorsRes.body.list || []).map(doctor => ({
+        ...doctor,
+        clinicName: doctor.clinic.id ? clinicMap[doctor.clinic.id] : 'Not Assigned'
+      }));
+
+      setRows(doctorsWithClinicNames);
       setClinics(clinicsRes.body.list || []);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -93,7 +106,7 @@ export default function DoctorsPageAdmin() {
       email: row.email || '', 
       specialization: row.specialization || '', 
       phone: row.phone || '', 
-      clinic: row.clinic || ''
+      clinic: row.clinicId?.toString() || ''
     }); 
     setErrors({});
     setOpen(true); 
@@ -101,14 +114,27 @@ export default function DoctorsPageAdmin() {
 
   const close = () => setOpen(false);
   
-  const handleDelete = (id) => async () => { 
-    if (!window.confirm('Delete this doctor?')) return; 
-    try {
-      await deleteDoctor(id); 
-      fetchData();
-    } catch (error) {
-      console.error("Error deleting doctor:", error);
-      alert("Failed to delete doctor. Please try again.");
+  const openDeleteDialog = (id, name) => () => {
+    setDoctorToDelete({ id, name });
+    setDeleteDialogOpen(true);
+  };
+  
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setDoctorToDelete(null);
+  };
+  
+  const confirmDelete = async () => {
+    if (doctorToDelete) {
+      try {
+        await deleteDoctor(doctorToDelete.id);
+        closeDeleteDialog();
+        fetchData();
+      } catch (error) {
+        console.error("Error deleting doctor:", error);
+        alert("Failed to delete doctor. Please try again.");
+        closeDeleteDialog();
+      }
     }
   };
 
@@ -131,19 +157,20 @@ export default function DoctorsPageAdmin() {
     if (!validateForm()) return;
     
     try {
-
-      const doctorData = { ...form };
-
-      console.log(doctorData);
+    
+      const doctorData = {
+        fullName: form.fullName,
+        password: form.password,
+        email: form.email,
+        specialization: form.specialization,
+        phone: form.phone,
+        clinicId: parseInt(form.clinic, 10)
+      };
       
-      if (doctorData.clinic) {
-        doctorData.clinic = parseInt(doctorData.clinic, 10);
-      }
       
       if (editing) {
         await updateDoctor(editing.id, doctorData);
       } else {
-
         await createDoctor(doctorData);
       }
       fetchData(); 
@@ -168,7 +195,7 @@ export default function DoctorsPageAdmin() {
       width: 120,
       getActions: (p) => [
         <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={openEdit(p.row)} />,
-        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={handleDelete(p.id)} showInMenu />
+        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={openDeleteDialog(p.row.id, p.row.fullName)} showInMenu />
       ]
     }
   ];
@@ -240,7 +267,7 @@ export default function DoctorsPageAdmin() {
                 value={form.password}
                 onChange={handleChange}
                 error={!!errors.password}
-                helperText={errors.password || (editing ? 'Leave blank to keep current password' : '')}
+                helperText={errors.password}
                 required={!editing}
               />
             </Grid>
@@ -273,7 +300,7 @@ export default function DoctorsPageAdmin() {
 
             <Grid item xs={12} md={6}>
               <FormControl fullWidth error={!!errors.clinic} required>
-                <InputLabel id="clinic-select-label">Clinic</InputLabel>
+                <InputLabel id="clinic-select-label">Clinic </InputLabel>
                 <Select
                   labelId="clinic-select-label"
                   id="clinic-select"
@@ -281,10 +308,12 @@ export default function DoctorsPageAdmin() {
                   value={form.clinic}
                   label="Clinic"
                   onChange={handleChange}
+                  sx={{ width: '100%', minWidth: '200px' }}
+                  displayEmpty
                 >
-                  <MenuItem value="" disabled>Select a clinic</MenuItem>
+                  <MenuItem value="" disabled></MenuItem>
                   {clinics.map((clinic) => (
-                    <MenuItem key={clinic.id} value={clinic.id}>
+                    <MenuItem key={clinic.id} value={clinic.id.toString()}>
                       {clinic.name}
                     </MenuItem>
                   ))}
@@ -303,6 +332,23 @@ export default function DoctorsPageAdmin() {
             color="primary"
           >
             {editing ? 'Save' : 'Create'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog} maxWidth="sm">
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
+          <WarningIcon color="warning" sx={{ mr: 1 }} /> Confirm Deletion
+        </DialogTitle>
+        <DialogContent>
+          <Typography>
+            Are you sure you want to delete Dr. {doctorToDelete?.name}? This action cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteDialog}>Cancel</Button>
+          <Button onClick={confirmDelete} variant="contained" color="error">
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
