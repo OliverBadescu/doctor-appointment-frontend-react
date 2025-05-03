@@ -1,11 +1,12 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { UserContext } from "../services/state/userContext";
+import { UserContext } from "../../services/state/userContext";
 
-export default function Login() {
+export default function DoctorLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { handleLogin, loading, errors } = useContext(UserContext);
+  const [providerCode, setProviderCode] = useState("");
+  const { handleDoctorLogin, loading, errors } = useContext(UserContext);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -14,17 +15,14 @@ export default function Login() {
     
     const loginRequest = {
       email,
-      password
+      password,
+      providerCode
     };
     
-    const result = await handleLogin(loginRequest);
+    const result = await handleDoctorLogin(loginRequest);
     
     if (result.success) {
-      if (result.role === "ADMIN") {
-        navigate("/admin/home");
-      } else {
-        navigate("/appointment");
-      }
+      navigate("/doctor/dashboard");
     }
   };
 
@@ -49,9 +47,9 @@ export default function Login() {
         
         <div className="login-form-container animate-slideUp">
           <div className="welcome-section">
-            <div className="welcome-title animate-fadeIn">Welcome Back</div>
+            <div className="welcome-title animate-fadeIn">Doctor Login</div>
             <div className="welcome-subtitle animate-fadeIn">
-              Sign in to your account to manage your appointments
+              Sign in to your provider account to manage patient appointments
             </div>
             {location.state?.message && (
               <div className="success-message animate-fadeIn">
@@ -76,18 +74,19 @@ export default function Login() {
                   id="email"
                   type="email"
                   className="form-input"
-                  placeholder="you@example.com"
+                  placeholder="doctor@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
+            
               
               <div className="form-group animate-slideUp">
                 <div className="password-header">
                   <label htmlFor="password" className="form-label">Password</label>
                   <Link 
-                    to="/forgot-password"
+                    to="/doctor/forgot-password"
                     className="forgot-password"
                   >
                     Forgot password?
@@ -115,16 +114,11 @@ export default function Login() {
           </div>
           
           <div className="signup-prompt animate-fadeIn">
+            
             <p className="signup-text">
-              Don't have an account?{" "}
-              <Link to="/signup" className="signup-link">
-                Sign up
-              </Link>
-            </p>
-            <p className="signup-text">
-              Are you a doctor?{" "}
-              <Link to="/login-doctor" className="signup-link">
-              Login here
+              Are you a patient?{" "}
+              <Link to="/login" className="signup-link">
+                Login here
               </Link>
             </p>
           </div>

@@ -14,6 +14,7 @@ import AdminHomePage from './components/admin/AdminHomePage.jsx';
 import ClinicsPageAdmin from './components/admin/ClinicsPageAdmin.jsx';
 import DoctorsPageAdmin from './components/admin/DoctorsPageAdmin.jsx';
 import PatientsPageAdmin from './components/admin/PatientsPageAdmin.jsx';
+import DoctorLogin from './components/doctor/DoctorLogin.jsx';
 
 function App() {
   return (
@@ -27,13 +28,16 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/appointment" element={<Dashboard />} />
           <Route path="/appointments/new" element={<NewAppointment />} />
-
+          <Route path="/login-doctor" element={<DoctorLogin />} />
           <Route path="/admin/*" element={<AdminLayout />}>  
             <Route path="home" element={<AdminHomePage />} />
             <Route path="clinics" element={<ClinicsPageAdmin />} />
             <Route path="doctors" element={<DoctorsPageAdmin />} />
             <Route path="patients" element={<PatientsPageAdmin />} />
             <Route index element={<Navigate to="home" replace />} />
+          </Route>
+          <Route path="/doctor/*" element={<AdminLayout />}>  
+            
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
