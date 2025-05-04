@@ -1,5 +1,9 @@
-function api(path, method = 'GET', body = null) {
-  const url = `http://www.localhost:8080/appointment/${path}`;
+import {loadConfig} from "./load.jsx";
+
+async function  api(path, method = 'GET', body = null) {
+  const { API_BASE } = await loadConfig();
+  const base = `${API_BASE.replace(/\/$/, '')}/appointment`;
+  const url  = `${base}/${path}`;
   const options = {
     method,
     headers: {
