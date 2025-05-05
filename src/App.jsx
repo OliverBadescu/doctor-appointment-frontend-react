@@ -15,34 +15,36 @@ import ClinicsPageAdmin from './components/admin/ClinicsPageAdmin.jsx';
 import DoctorsPageAdmin from './components/admin/DoctorsPageAdmin.jsx';
 import PatientsPageAdmin from './components/admin/PatientsPageAdmin.jsx';
 import DoctorLogin from './components/doctor/DoctorLogin.jsx';
+import DoctorDashboard from "./components/doctor/DoctorDashboard.jsx";
+import { DoctorProvider } from './services/state/doctorContext.jsx';
 
 function App() {
   return (
     <Router>
       <UserProvider>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/appointment" element={<Dashboard />} />
-          <Route path="/appointments/new" element={<NewAppointment />} />
-          <Route path="/login-doctor" element={<DoctorLogin />} />
-          <Route path="/admin/*" element={<AdminLayout />}>  
-            <Route path="home" element={<AdminHomePage />} />
-            <Route path="clinics" element={<ClinicsPageAdmin />} />
-            <Route path="doctors" element={<DoctorsPageAdmin />} />
-            <Route path="patients" element={<PatientsPageAdmin />} />
-            <Route index element={<Navigate to="home" replace />} />
-          </Route>
-          <Route path="/doctor/*" element={<AdminLayout />}>  
-            
-          </Route>
+        <DoctorProvider>
+          <Navbar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/appointment" element={<Dashboard />} />
+            <Route path="/appointments/new" element={<NewAppointment />} />
+            <Route path="/login-doctor" element={<DoctorLogin />} />
+            <Route path="/admin/*" element={<AdminLayout />}>  
+              <Route path="home" element={<AdminHomePage />} />
+              <Route path="clinics" element={<ClinicsPageAdmin />} />
+              <Route path="doctors" element={<DoctorsPageAdmin />} />
+              <Route path="patients" element={<PatientsPageAdmin />} />
+              <Route index element={<Navigate to="home" replace />} />
+            </Route>
+            <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        <Footer />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <Footer />
+        </DoctorProvider>
       </UserProvider>
     </Router>
   );

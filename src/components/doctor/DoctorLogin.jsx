@@ -1,12 +1,11 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { UserContext } from "../../services/state/userContext";
+import { DoctorContext } from "../../services/state/doctorContext";
 
 export default function DoctorLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [providerCode, setProviderCode] = useState("");
-  const { handleDoctorLogin, loading, errors } = useContext(UserContext);
+  const { handleDoctorLogin, loading, errors } = useContext(DoctorContext);
   const navigate = useNavigate();
   const location = useLocation();
   
@@ -15,8 +14,7 @@ export default function DoctorLogin() {
     
     const loginRequest = {
       email,
-      password,
-      providerCode
+      password
     };
     
     const result = await handleDoctorLogin(loginRequest);

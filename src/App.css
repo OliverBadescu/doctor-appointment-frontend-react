@@ -1014,3 +1014,344 @@
 #clinic-select-label{
   width: 100%;
 }
+
+
+.doctor-dashboard-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.welcome-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 0.25rem;
+}
+
+.welcome-subtitle {
+  color: var(--gray-600);
+  font-size: 1rem;
+}
+
+.manage-button {
+  padding: 0.625rem 1.25rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.manage-button:hover {
+  background-color: var(--primary-dark);
+}
+
+/* Dashboard Stats */
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.stat-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-header {
+  margin-bottom: 1rem;
+}
+
+.stat-title {
+  color: var(--gray-600);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--gray-800);
+}
+
+/* Appointments Section */
+.appointments-section {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.filter-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--border-radius);
+  color: var(--gray-700);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  background-color: var(--gray-200);
+}
+
+.filter-button.active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.appointment-card {
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.25rem;
+  border-left: 4px solid var(--gray-300);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.appointment-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.appointment-card.upcoming {
+  border-left-color: var(--primary-color);
+}
+
+.appointment-card.completed {
+  border-left-color: var(--success-color);
+}
+
+.appointment-card.cancelled {
+  border-left-color: var(--danger-color);
+}
+
+.appointment-layout {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem;
+}
+
+.appointment-details {
+  flex: 1;
+}
+
+.appointment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.patient-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 0.25rem;
+}
+
+.appointment-id {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+}
+
+.appointment-status {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge.upcoming {
+  background-color: var(--primary-light);
+  color: var(--primary-dark);
+}
+
+.status-badge.completed {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.status-badge.cancelled {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.today-badge {
+  background-color: #fef3c7;
+  color: #92400e;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.appointment-reason {
+  margin-bottom: 1rem;
+  color: var(--gray-700);
+  font-size: 0.875rem;
+}
+
+.appointment-time-info {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.time-detail {
+  min-width: 120px;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  color: var(--gray-500);
+  margin-bottom: 0.25rem;
+}
+
+.detail-value {
+  font-size: 0.875rem;
+  color: var(--gray-700);
+  font-weight: 500;
+}
+
+.appointment-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 10rem;
+}
+
+.action-button {
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  border: 1px solid;
+}
+
+.complete-button {
+  background-color: var(--success-color);
+  color: white;
+  border-color: var(--success-color);
+}
+
+.complete-button:hover {
+  background-color: #059669;
+}
+
+.cancel-button {
+  background-color: white;
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.cancel-button:hover {
+  background-color: #fee2e2;
+}
+
+.view-patient-button {
+  background-color: white;
+  color: var(--gray-700);
+  border-color: var(--gray-300);
+}
+
+.view-patient-button:hover {
+  background-color: var(--gray-100);
+}
+
+.empty-appointments {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.empty-message {
+  color: var(--gray-600);
+  margin-bottom: 1.5rem;
+}
+
+.return-button {
+  padding: 0.625rem 1.25rem;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.return-button:hover {
+  background-color: var(--primary-dark);
+}
+
+.loading, .error-message {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin: 2rem auto;
+  max-width: 800px;
+}
+
+.error-message {
+  color: var(--danger-color);
+}

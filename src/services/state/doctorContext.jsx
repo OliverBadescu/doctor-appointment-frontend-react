@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { doctorLogin } from "../api/doctorService";
+import { login } from "../api/doctorService";
 
 export const DoctorContext = createContext();
 
@@ -9,7 +9,7 @@ export function DoctorProvider({ children }) {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
   const [doctor, setDoctor] = useState({
-    jwtToken: '', 
+        jwtToken: '',
         fullName: '',
         password: '',
         email: '',
@@ -68,7 +68,7 @@ export function DoctorProvider({ children }) {
     setLoading(true);
     setErrors([]);
     try {
-      const data = await doctorLogin(loginRequest);
+      const data = await login(loginRequest);
       if (!data.success) {
         setErrors(["Invalid credentials, please try again"]);
         return { success: false };

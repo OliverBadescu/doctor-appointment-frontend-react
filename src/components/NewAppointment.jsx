@@ -32,8 +32,7 @@ export default function NewAppointment() {
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
   const [error, setError] = useState("");
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
-  
-  // Success modal state
+
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [appointmentDetails, setAppointmentDetails] = useState(null);
 

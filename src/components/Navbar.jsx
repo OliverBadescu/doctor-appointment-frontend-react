@@ -57,7 +57,7 @@ export default function Navbar() {
               (<>
               
               <Link to="/appointment" className="animate-fadeIn" >
-                <Button variant="ghost">Appointemnts</Button>
+                <Button variant="ghost">Appointments</Button>
               </Link>
               <Link to="/appointments/new" className="animate-fadeIn" >
                 <Button variant="ghost">New Appointment</Button>

@@ -47,6 +47,14 @@ async function api(path, method = 'GET', body = null) {
     return request('getAllDoctors', 'GET');
   }
 
+  export function login(loginRequest){
+    return request('login/doctor', 'POST', loginRequest);
+  }
+
+  export function getAllDoctorAppointments(doctorId){
+   return request(`getAllDoctorAppointments/${doctorId}`, "GET");
+  }
+
   export function getDoctorAvailability(date, doctorId){
     const data = { getDate: date };
     return request(`available/${doctorId}`, 'POST', data);
