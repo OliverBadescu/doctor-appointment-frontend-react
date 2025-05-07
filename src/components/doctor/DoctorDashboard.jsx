@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DoctorContext } from '../../services/state/doctorContext';
 import { getAllDoctorAppointments } from '../../services/api/doctorService';
+import { getAllPatientAppointments, updateStatus } from '../../services/api/appointmentService';
 
 export default function DoctorDashboard() {
     const { doctor } = useContext(DoctorContext);
@@ -16,6 +17,14 @@ export default function DoctorDashboard() {
         thisWeek: 0,
         completed: 0
     });
+    const [statusUpdating, setStatusUpdating] = useState(false);
+    const [updateMessage, setUpdateMessage] = useState({ text: '', type: '' });
+
+    const [showModal, setShowModal] = useState(false);
+    const [selectedPatient, setSelectedPatient] = useState(null);
+    const [patientAppointments, setPatientAppointments] = useState([]);
+    const [loadingPatientHistory, setLoadingPatientHistory] = useState(false);
+    const [patientHistoryError, setPatientHistoryError] = useState(null);
 
     useEffect(() => {
         if (!doctor || doctor.id === 0) {
@@ -23,7 +32,6 @@ export default function DoctorDashboard() {
             return;
         }
 
-        
         if (doctor.userRole !== 'DOCTOR') {
             navigate('/unauthorized');
             return;
@@ -34,10 +42,14 @@ export default function DoctorDashboard() {
             try {
                 const response = await getAllDoctorAppointments(doctor.id);
                 if (response.success) {
-                    const appointmentsList = response.body.list || [];
-                    setAppointments(appointmentsList);
-                    calculateStats(appointmentsList);
-                } else {
+                    const raw = response.body.list || [];
+                    const normalized = raw.map(app => ({
+                      ...app,
+                      status: app.status.toLowerCase()
+                    }));
+                    setAppointments(normalized);
+                    calculateStats(normalized);
+                  } else {
                     setError("Failed to load appointments");
                     console.error("Error fetching appointments:", response.message);
                 }
@@ -51,6 +63,16 @@ export default function DoctorDashboard() {
 
         fetchAppointments();
     }, [doctor, navigate]);
+
+    useEffect(() => {
+        
+        if (updateMessage.text) {
+            const timer = setTimeout(() => {
+                setUpdateMessage({ text: '', type: '' });
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [updateMessage]);
 
     const calculateStats = (appointmentsList) => {
         const now = new Date();
@@ -79,7 +101,6 @@ export default function DoctorDashboard() {
                     stats.today++;
                 }
 
-    
                 if (appointmentDate >= today && appointmentDate <= endOfWeek) {
                     stats.thisWeek++;
                 }
@@ -90,13 +111,91 @@ export default function DoctorDashboard() {
     };
 
     const getFilteredAppointments = () => {
-        if (filter === 'all') {
-            return appointments;
-        }
+        if (filter === 'all') return appointments;
+        return appointments.filter(app => app.status.toLowerCase() === filter);
+      };
+      
 
-        return appointments.filter(appointment => appointment.status === filter);
+    const handleOpenPatientModal = async (patientId, patientName) => {
+        setSelectedPatient({ id: patientId, name: patientName });
+        setShowModal(true);
+        setLoadingPatientHistory(true);
+        setPatientHistoryError(null);
+        
+        try {
+           
+            const response = await getAllPatientAppointments(patientId);
+
+            console.log(response);
+            if (response.success) {
+                const raw = response.body.appointments || [];
+                const normalized = raw.map(app => ({
+                    ...app,
+                    status: app.status.toLowerCase()
+                }));
+                setPatientAppointments(normalized);
+            } else {
+                setPatientHistoryError("Failed to load patient history");
+                console.error("Error fetching patient history:", response.message);
+            }
+        } catch (err) {
+            setPatientHistoryError("An error occurred while fetching patient history");
+            console.error(err);
+        } finally {
+            setLoadingPatientHistory(false);
+        }
     };
 
+    const handleCloseModal = () => {
+        setShowModal(false);
+        setSelectedPatient(null);
+        setPatientAppointments([]);
+        setPatientHistoryError(null);
+    };
+
+    const handleUpdateStatus = async (appointmentId, newStatus) => {
+        setStatusUpdating(true);
+        
+        
+        const statusForBackend = newStatus.toUpperCase();
+        
+        try {
+            const response = await updateStatus({status:statusForBackend},appointmentId );
+            
+            if (response.success) {
+            
+                const updatedAppointments = appointments.map(appointment => {
+                    if (appointment.id === appointmentId) {
+                        return { ...appointment, status: newStatus.toLowerCase() };
+                    }
+                    return appointment;
+                });
+                
+                setAppointments(updatedAppointments);
+                calculateStats(updatedAppointments);
+                
+                setUpdateMessage({
+                    text: `Appointment status updated to ${newStatus}`,
+                    type: 'success'
+                });
+                
+            } else {
+                setUpdateMessage({
+                    text: `Failed to update status: ${response.message}`,
+                    type: 'error'
+                });
+                console.error("Error updating appointment status:", response.message);
+            }
+        } catch (err) {
+            setUpdateMessage({
+                text: "An error occurred while updating the status",
+                type: 'error'
+            });
+            console.error("Exception during status update:", err);
+        } finally {
+            setStatusUpdating(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -128,6 +227,12 @@ export default function DoctorDashboard() {
                     </p>
                 </div>
             </div>
+
+            {updateMessage.text && (
+                <div className={`status-message ${updateMessage.type} animate-fadeIn`}>
+                    {updateMessage.text}
+                </div>
+            )}
 
             <div className="dashboard-stats animate-fadeIn delay-150">
                 <div className="stat-card animate-slideUp">
@@ -218,19 +323,19 @@ export default function DoctorDashboard() {
                                             <div className="appointment-header">
                                                 <div>
                                                     <h3 className="patient-name">
-                                                        {appointment.patient?.fullName || "Unknown Patient"}
+                                                        {appointment.user?.fullName || "Unknown Patient"}
                                                     </h3>
                                                     <p className="appointment-id">
                                                         ID: {appointment.id}
                                                     </p>
                                                 </div>
                                                 <div className="appointment-status">
-                          <span className={`status-badge ${appointment.status}`}>
-                            {appointment.status === 'upcoming' ? 'Upcoming' :
-                                appointment.status === 'completed' ? 'Completed' :
-                                    appointment.status === 'cancelled' ? 'Cancelled' :
-                                        appointment.status || 'Scheduled'}
-                          </span>
+                                                    <span className={`status-badge ${appointment.status}`}>
+                                                        {appointment.status === 'upcoming' ? 'Upcoming' :
+                                                            appointment.status === 'completed' ? 'Completed' :
+                                                            appointment.status === 'cancelled' ? 'Cancelled' :
+                                                            appointment.status || 'Scheduled'}
+                                                    </span>
                                                     {isToday && <span className="today-badge">Today</span>}
                                                 </div>
                                             </div>
@@ -257,7 +362,7 @@ export default function DoctorDashboard() {
                                                 <div className="time-detail">
                                                     <p className="detail-label">Patient ID</p>
                                                     <p className="detail-value">
-                                                        {appointment.patient?.id || "N/A"}
+                                                        {appointment.user?.id || "N/A"}
                                                     </p>
                                                 </div>
                                             </div>
@@ -267,24 +372,30 @@ export default function DoctorDashboard() {
                                             {appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
                                                 <>
                                                     <button
-                                                        className="action-button complete-button animate-fadeIn delay-300"
-                                                        onClick={() => updateStatus(appointment.id, 'completed')}
+                                                        className="action-button complete-button animate-fadeIn"
+                                                        onClick={() => handleUpdateStatus(appointment.id, 'completed')}
+                                                        disabled={statusUpdating}
                                                     >
-                                                        Mark Completed
+                                                        {statusUpdating ? 'Updating...' : 'Mark Completed'}
                                                     </button>
                                                     <button
-                                                        className="action-button cancel-button animate-fadeIn delay-350"
-                                                        onClick={() => updateStatus(appointment.id, 'cancelled')}
+                                                        className="action-button cancel-button animate-fadeIn"
+                                                        onClick={() => handleUpdateStatus(appointment.id, 'cancelled')}
+                                                        disabled={statusUpdating}
                                                     >
-                                                        Cancel
+                                                        {statusUpdating ? 'Updating...' : 'Cancel'}
                                                     </button>
                                                 </>
                                             )}
-                                            <Link to={`/patients/${appointment.patient?.id || 0}`}>
-                                                <button className="action-button view-patient-button animate-fadeIn delay-400">
-                                                    Patient Details
-                                                </button>
-                                            </Link>
+                                            <button 
+                                                className="action-button view-patient-button animate-fadeIn "
+                                                onClick={() => handleOpenPatientModal(
+                                                    appointment.user?.id || 0, 
+                                                    appointment.user?.fullName || "Unknown Patient"
+                                                )}
+                                            >
+                                                Patient Details
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -313,6 +424,73 @@ export default function DoctorDashboard() {
                     </div>
                 )}
             </div>
+
+           
+            {showModal && (
+                <div className="modal-overlay">
+                    <div className="modal-container">
+                        <div className="modal-header">
+                            <h2>Patient Appointment History - {selectedPatient?.name}</h2>
+                            <button className="close-button" onClick={handleCloseModal}>×</button>
+                        </div>
+                        
+                        <div className="modal-content">
+                            {loadingPatientHistory ? (
+                                <div className="loading-spinner">Loading patient history...</div>
+                            ) : patientHistoryError ? (
+                                <div className="error-message">{patientHistoryError}</div>
+                            ) : patientAppointments.length === 0 ? (
+                                <div className="empty-state">No previous appointments found for this patient.</div>
+                            ) : (
+                                <div className="patient-appointments-list">
+                                    <h3>Previous Appointments</h3>
+                                    <table className="appointments-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Time</th>
+                                                <th>Reason</th>
+                                                <th>Status</th>
+                                                <th>Doctor</th>
+                    
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {patientAppointments.map((appointment) => {
+                                                const appointmentDate = new Date(appointment.start.replace(" ", "T"));
+                                                return (
+                                                    <tr key={appointment.id} className={`appointment-row ${appointment.status}`}>
+                                                        <td>{appointmentDate.toLocaleDateString('en-US', {
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            year: 'numeric'
+                                                        })}</td>
+                                                        <td>{appointmentDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</td>
+                                                        <td>{appointment.reason || "Not specified"}</td>
+                                                        <td>
+                                                            <span className={`status-indicator ${appointment.status}`}>
+                                                                {appointment.status === 'upcoming' ? 'Upcoming' :
+                                                                 appointment.status === 'completed' ? 'Completed' :
+                                                                 appointment.status === 'cancelled' ? 'Cancelled' : 
+                                                                 appointment.status || 'Unknown'}
+                                                            </span>
+                                                        </td>
+                                                        <td>{appointment.doctor?.fullName || "N/A"}</td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="modal-footer">
+                            <button className="modal-button secondary" onClick={handleCloseModal}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

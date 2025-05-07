@@ -77,3 +77,7 @@ export function getDoctorAppointments(doctorId) {
 export function getTotalAppointments(){
   return request('getTotalAppointments', 'GET');
 }
+
+export function updateStatus(status, appointmentId){
+  return request(`updateStatus/${appointmentId}`, 'PUT', status);
+}
