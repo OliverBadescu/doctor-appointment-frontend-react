@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "antd";
-import { UserContext } from "../services/state/userContext";
+import { UserContext } from "../services/state/userState";
 import "../animations.css";
 
 export default function Home() {

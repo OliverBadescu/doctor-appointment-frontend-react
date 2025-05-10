@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllClinic } from '../services/api/clinicService';
 import { getAllDoctors, getDoctorAvailability } from '../services/api/doctorService';
 import { createAppointment } from '../services/api/appointmentService';
-import { UserContext } from '../services/state/userContext';
+import { UserContext } from '../services/state/userState';
 import { 
   Dialog, 
   DialogActions, 

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { UserContext } from '../services/state/userContext';
+import { UserContext } from '../services/state/userState';
 
 export default function Signup() {
   const [formData, setFormData] = useState({

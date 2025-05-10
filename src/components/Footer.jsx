@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { UserContext } from "../services/state/userContext";
+import { UserContext } from "../services/state/userState";
 import { useContext } from "react";
 
 export default function Footer() {

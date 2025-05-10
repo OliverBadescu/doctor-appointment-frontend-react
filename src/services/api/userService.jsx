@@ -1,78 +1,32 @@
-import {loadConfig} from "./load.jsx";
+import {request} from "./api-utils.jsx";
 
-async function api(path, method = 'GET', body = null) {
-    const { API_BASE } = await loadConfig();
-    const base = `${API_BASE.replace(/\/$/, '')}/user`;
-    const url  = `${base}/${path}`;
-    const options = {
-      method,
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-    };
 
-  
-    if (body) {
-      options.body = JSON.stringify(body);
-    }
-  
-    return fetch(url, options);
-  }
-  
-  async function request(path, method = 'GET', body = null) {
-    try {
-        const response = await api(path, method, body);
-        const data = await response.json().catch(() => null);
-
-        
-        if (response.status === 200 || response.status === 202) {
-            return {
-                success: true,
-                status: response.status,
-                body: data
-            };
-        }
-
-        
-        const errorMessage = (data && data.message) || response.statusText || 'Request failed';
-        const error = new Error(errorMessage);
-        error.status = response.status;
-        throw error;
-    } catch (error) {
-        return {
-            success: false,
-            status: error.status || 500,
-            message: error.message || 'Something went wrong',
-        };
-    }
-}
-
+const baseUrl = "user";
 
 export function login(loginRequest){
-  return request('login', 'POST', loginRequest);
+  return request(baseUrl+'/login', 'POST', loginRequest);
 }
 
 export function register(registerRequest){
-  return request('register', 'POST', registerRequest);
+  return request(baseUrl+'/register', 'POST', registerRequest);
 }
 
 export function getById(userId){
-  return request (`getUserById/${userId}`, 'GET');
+  return request (baseUrl+`/getUserById/${userId}`, 'GET');
 }
 
 export async function updateUser(userId, updateRequest){
-  return request(`update/${userId}`, 'PUT', updateRequest);
+  return request(baseUrl+`/update/${userId}`, 'PUT', updateRequest);
 }
 
 export function totalUsers(){
-  return request('totalUsers', 'GET');
+  return request(baseUrl+'/totalUsers', 'GET');
 }
 
 export function getAllUsers(){
-  return request('getAllUsers', 'GET');
+  return request(baseUrl+'/getAllUsers', 'GET');
 }
 
 export function deleteUser(id){
-  return request(`delete/${id}`, 'DELETE');
+  return request(baseUrl+`/delete/${id}`, 'DELETE');
 }

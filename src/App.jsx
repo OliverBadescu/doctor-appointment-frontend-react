@@ -8,7 +8,7 @@ import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import NewAppointment from './components/NewAppointment.jsx';
-import { UserProvider } from './services/state/userContext.jsx';
+import { UserProvider } from './services/state/userState.jsx';
 import AdminLayout from './components/admin/AdminLayout.jsx';
 import AdminHomePage from './components/admin/AdminHomePage.jsx';
 import ClinicsPageAdmin from './components/admin/ClinicsPageAdmin.jsx';

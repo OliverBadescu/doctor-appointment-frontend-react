@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { UserContext } from "../services/state/userContext";
+import { UserContext } from "../services/state/userState";
 
 export default function Login() {
   const [email, setEmail] = useState("");
