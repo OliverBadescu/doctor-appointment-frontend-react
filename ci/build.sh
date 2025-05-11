@@ -3,7 +3,7 @@ set -euo pipefail
 
 # === Config ===
 USERNAME="oliver005"          # Docker Hub username
-REPO="doctor_appointment_api"           # Repository name
+REPO="doctor-appointment-frontend-react"           # Repository name
 ENVIRONMENT="${1:-test}"       # test | staging | prod (default: test)
 BUILD_NUMBER="$(date '+%d.%m.%Y.%H.%M.%S')"
 TAG="${BUILD_NUMBER}-${ENVIRONMENT}"
