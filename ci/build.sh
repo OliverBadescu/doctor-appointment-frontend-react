@@ -39,7 +39,7 @@ fi
 
 docker buildx build \
   --platform linux/amd64 \
-  --build-arg NODE_ENV="$ENVIRONMENT" \
+  --build-arg NODE_ENV="-prod" \
   --cache-from type=registry,ref="$CACHE_IMAGE" \
   --cache-to   type=registry,ref="$CACHE_IMAGE",mode=max \
   -t "$FULL_IMAGE" \
