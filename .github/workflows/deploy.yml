@@ -29,7 +29,4 @@ jobs:
       - name: Docker Build and push
         run: |
           chmod +x ci/build.sh
-          USERNAME=oliver005 \
-          REPO=doctor-appointment-frontend-react \
-          TAG=${{ env.BUILD_NUMBER }} \
-          ci/build.sh ./
+          ci/build.sh prod
