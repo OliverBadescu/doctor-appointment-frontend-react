@@ -40,7 +40,7 @@ fi
 
 
 docker buildx build \
-  --platform linux/amd64 \
+  --platform linux/amd64,linux/arm64 \
   --build-arg NODE_ENV="$ENVIRONMENT" \
   --build-arg VITE_API_URL="$VITE_API_URL" \
   --cache-from type=registry,ref="$CACHE_IMAGE" \
