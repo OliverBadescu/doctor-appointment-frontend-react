@@ -4,7 +4,7 @@ set -euo pipefail
 # === Config ===
 USERNAME="oliver005"
 REPO="doctor-appointment-frontend-react"
-ENVIRONMENT="${1:-dev}"
+ENVIRONMENT="${1:-prod}"
 BUILD_NUMBER="$(date '+%d.%m.%Y.%H.%M.%S')"
 TAG="${BUILD_NUMBER}-${ENVIRONMENT}"
 CACHE_TAG="buildcache"
@@ -40,7 +40,7 @@ echo "🌀  Build tag:   $TAG"
 
 
 docker buildx build \
-  --platform linux/amd64,linux/arm64 \
+  --platform linux/amd64 \
   --build-arg VITE_MODE="$ENVIRONMENT" \
   --cache-from type=registry,ref="$CACHE_IMAGE" \
   --cache-to   type=registry,ref="$CACHE_IMAGE",mode=max \
