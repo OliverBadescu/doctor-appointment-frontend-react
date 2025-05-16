@@ -81,13 +81,13 @@ export default function Dashboard() {
           </p>
         </div>
         <Link to="/appointments/new">
-          <button className="book-button animate-fadeIn delay-100">
+          <button className="book-button animate-fadeIn">
             Book New Appointment
           </button>
         </Link>
       </div>
       
-      <div className="dashboard-cards animate-fadeIn delay-150">
+      <div className="dashboard-cards animate-fadeIn">
         <div className="dashboard-card animate-slideUp">
           <div className="card-header">
             <div className="card-title">Upcoming Appointments</div>
@@ -101,7 +101,7 @@ export default function Dashboard() {
         </div>
       </div>
       
-      <div className="appointments-section animate-fadeIn delay-200">
+      <div className="appointments-section animate-fadeIn">
         <div className="section-header">
           <h2 className="section-title">Your Upcoming Appointments</h2>
         </div>
@@ -156,11 +156,11 @@ export default function Dashboard() {
                       </div>
                     </div>
                     <div className="appointment-actions">
-                      <button className="action-button reschedule-button animate-fadeIn delay-300">
+                      <button className="action-button reschedule-button animate-fadeIn">
                         Reschedule
                       </button>
                       <button
-                        className="action-button cancel-button animate-fadeIn delay-350"
+                        className="action-button cancel-button animate-fadeIn"
                         onClick={() => cancelAppointment(appointment.id)}
                       >
                         Cancel
