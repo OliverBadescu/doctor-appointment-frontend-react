@@ -27,6 +27,8 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Docker Build and push
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: |
           chmod +x ci/build.sh
           ci/build.sh prod
