@@ -1,18 +1,54 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# === Config ===
+USERNAME="oliver005"          # Docker Hub username
+REPO="doctor-appointment-frontend-react"           # Repository name
+ENVIRONMENT="${1:-prod}"       # test | staging | prod (default: test)
+BUILD_NUMBER="$(date '+%d.%m.%Y.%H.%M.%S')"
+TAG="${BUILD_NUMBER}-${ENVIRONMENT}"
+CACHE_TAG="buildcache"
+BUILDER_NAME="multiarch-builder"
 
-: "${USERNAME:?USERNAME not set or empty}"
-: "${REPO:?REPO not set or empty}"
-: "${TAG:?TAG not set or empty}"
+FULL_IMAGE="$USERNAME/$REPO:$TAG"
+CACHE_IMAGE="$USERNAME/$REPO:$CACHE_TAG"
+
+printf '\n🚀  Building multi‑arch Docker image: %s (linux/amd64 + linux/arm64)\n' "$FULL_IMAGE"
+
+# === Ensure buildx builder ===
+if ! docker buildx inspect "$BUILDER_NAME" >/dev/null 2>&1; then
+  echo "🔧  Creating buildx builder '$BUILDER_NAME' with docker-container driver…"
+  docker buildx create --name "$BUILDER_NAME" --driver docker-container --use
+else
+  docker buildx use "$BUILDER_NAME"
+fi
+
+if ! docker buildx inspect "$BUILDER_NAME" | grep -q "linux/arm64"; then
+  echo "🔧  Registering binfmt for cross‑arch builds…"
+  docker run --privileged --rm tonistiigi/binfmt:latest --install all
+  docker buildx inspect "$BUILDER_NAME" --bootstrap > /dev/null
+fi
 
 
-docker buildx create --use
+if ! docker info | grep -q "Username: $USERNAME"; then
+  echo "🔐  Logging into Docker Hub…"
+  docker login
+fi
+
+echo "🌎  Environment: $ENVIRONMENT"
+echo "🌀  Build tag:   $TAG"
+
 
 docker buildx build \
-    --platform=linux/amd64 \
-    -t "${USERNAME}/${REPO}:${TAG}" \
-    -t "${USERNAME}/${REPO}:latest" \
-    "${@:2}" \
-    --push \
-    "$1"
+  --platform linux/amd64 \
+  --build-arg VITE_MODE="$ENVIRONMENT" \
+  --cache-from type=registry,ref="$CACHE_IMAGE" \
+  --cache-to   type=registry,ref="$CACHE_IMAGE",mode=max \
+  -t "$FULL_IMAGE" \
+  . --push
+
+printf '\n✅  Done! Multi‑arch image pushed as: %s\n' "$FULL_IMAGE"
+# --- Output pentru GitHub Actions (doar cand rulez in workflow) ---
+if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
+  echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+fi
