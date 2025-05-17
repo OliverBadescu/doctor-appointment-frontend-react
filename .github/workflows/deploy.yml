@@ -35,3 +35,32 @@ jobs:
         run: |
           chmod +x ci/build-publish.sh
           ./ci/build-publish.sh "$ENVIRONMENT"  
+  
+  deploy-ec2:
+    needs: build-client
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update tag & restart client
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host:     ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key:      ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -euo pipefail
+
+            ENV_FILE=/doctor-appointment-ex/.env
+            NEW_TAG="${{ needs.build-client.outputs.tag }}"
+
+            echo "🔄  Set CLIENT_TAG=$NEW_TAG"
+            if grep -q '^CLIENT_TAG=' "$ENV_FILE"; then
+              sudo sed -i "s/^CLIENT_TAG=.*/CLIENT_TAG=$NEW_TAG/" "$ENV_FILE"
+            else
+              echo "CLIENT_TAG=$NEW_TAG" | sudo tee -a "$ENV_FILE"
+            fi
+
+            echo "🚢  Pull & restart client"
+            # dacă fișierul tău se numește docker-compose.yml, schimbă extensia aici
+            sudo docker compose -f /doctor-appointment-api/docker-compose.yaml pull client
+            sudo docker compose -f /doctor-appointment-api/docker-compose.yaml up -d --no-deps client
