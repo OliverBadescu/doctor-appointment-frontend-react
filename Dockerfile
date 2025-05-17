@@ -1,13 +1,11 @@
+# ---------- Build Stage ----------
 FROM node:18-alpine AS build
 
 WORKDIR /app
 
 
 ARG VITE_MODE=production
-ARG VITE_API_URL
-
 ENV VITE_MODE=$VITE_MODE
-ENV VITE_API_URL=$VITE_API_URL
 
 
 
