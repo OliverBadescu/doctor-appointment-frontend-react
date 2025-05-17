@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # === Config ===
-USERNAME="oliver005"          # Docker Hub username
-REPO="doctor-appointment-frontend-react"           # Repository name
-ENVIRONMENT="${1:-prod}"       # test | staging | prod (default: test)
+USERNAME="oliver005"
+REPO="doctor-appointment-frontend-react"
+ENVIRONMENT="${1:-dev}"
 BUILD_NUMBER="$(date '+%d.%m.%Y.%H.%M.%S')"
 TAG="${BUILD_NUMBER}-${ENVIRONMENT}"
 CACHE_TAG="buildcache"
@@ -40,7 +40,7 @@ echo "🌀  Build tag:   $TAG"
 
 
 docker buildx build \
-  --platform linux/amd64 \
+  --platform linux/amd64,linux/arm64 \
   --build-arg VITE_MODE="$ENVIRONMENT" \
   --cache-from type=registry,ref="$CACHE_IMAGE" \
   --cache-to   type=registry,ref="$CACHE_IMAGE",mode=max \
@@ -48,7 +48,7 @@ docker buildx build \
   . --push
 
 printf '\n✅  Done! Multi‑arch image pushed as: %s\n' "$FULL_IMAGE"
-# --- Output pentru GitHub Actions (doar cand rulez in workflow) ---
+# --- Output pentru GitHub Actions (doar când rulez în workflow) ---
 if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
   echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 fi

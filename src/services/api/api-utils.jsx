@@ -2,6 +2,8 @@ export async function api(path = '', method = 'GET', body = null) {
     const base = import.meta.env.VITE_API_URL;
     const url  = `${base}/${path}`;
 
+
+    console.log(url);
     const options = {
         method,
         headers: {
