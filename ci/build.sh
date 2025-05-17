@@ -13,7 +13,6 @@ BUILDER_NAME="multiarch-builder"
 FULL_IMAGE="$USERNAME/$REPO:$TAG"
 CACHE_IMAGE="$USERNAME/$REPO:$CACHE_TAG"
 
-: "${VITE_API_URL:?VITE_API_URL is required but not set}"
 
 printf '\n🚀  Building multi‑arch Docker image: %s (linux/amd64 + linux/arm64)\n' "$FULL_IMAGE"
 
@@ -42,7 +41,6 @@ fi
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --build-arg NODE_ENV="$ENVIRONMENT" \
-  --build-arg VITE_API_URL="$VITE_API_URL" \
   --cache-from type=registry,ref="$CACHE_IMAGE" \
   --cache-to   type=registry,ref="$CACHE_IMAGE",mode=max \
   -t "$FULL_IMAGE" \
