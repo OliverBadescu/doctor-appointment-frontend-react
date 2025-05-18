@@ -43,6 +43,8 @@ jobs:
     steps:
       - name: Update tag & restart client
         uses: appleboy/ssh-action@v0.1.10
+        env:
+         COMPOSE_PROJECT_NAME: doctorapp
         with:
           host:     ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
