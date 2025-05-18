@@ -50,7 +50,7 @@ jobs:
           script: |
             set -euo pipefail
 
-            ENV_FILE=/doctor-appointment-ex/.env
+            ENV_FILE=/home/ubuntu/.env
             NEW_TAG="${{ needs.build-client.outputs.tag }}"
 
             echo "🔄  Set CLIENT_TAG=$NEW_TAG"
@@ -62,5 +62,5 @@ jobs:
 
             echo "🚢  Pull & restart client"
             # dacă fișierul tău se numește docker-compose.yml, schimbă extensia aici
-            sudo docker compose -f /doctor-appointment-api/docker-compose.yaml pull client
-            sudo docker compose -f /doctor-appointment-api/docker-compose.yaml up -d --no-deps client
+            sudo docker compose -f /home/ubuntu/docker-compose.yaml pull client
+            sudo docker compose -f /home/ubuntu/docker-compose.yaml up -d --no-deps client
