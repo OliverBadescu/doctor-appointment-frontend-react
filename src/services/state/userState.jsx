@@ -21,7 +21,7 @@ export function UserProvider({ children }) {
     if(user.id === 0){
         navigate('/');
     }
-}
+  }
 
     useEffect(() => {
         checkUser();
