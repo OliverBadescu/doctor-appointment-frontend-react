@@ -48,13 +48,15 @@ export default function DoctorsPageAdmin() {
       });
 
       
+      setClinics(clinicsRes.body.list || []);
       const doctorsWithClinicNames = (doctorsRes.body.list || []).map(doctor => ({
         ...doctor,
         clinicName: doctor.clinic.id ? clinicMap[doctor.clinic.id] : 'Not Assigned'
       }));
 
+
       setRows(doctorsWithClinicNames);
-      setClinics(clinicsRes.body.list || []);
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
