@@ -58,6 +58,153 @@ const CancelConfirmationModal = ({ isOpen, onClose, onConfirm, appointmentDetail
   );
 };
 
+const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
+  const [rating, setRating] = useState(0);
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+
+  const handleSubmitReview = () => {
+    if (rating === 0) {
+      alert('Please select a rating');
+      return;
+    }
+    if (title.trim() === '') {
+      alert('Please enter a title for your review');
+      return;
+    }
+
+    const reviewData = {
+      appointmentId: appointmentDetails?.id,
+      doctorId: appointmentDetails?.doctor?.id,
+      rating,
+      title: title.trim(),
+      description: description.trim()
+    };
+
+    onSubmit(reviewData);
+    
+    // Reset form
+    setRating(0);
+    setHoveredRating(0);
+    setTitle('');
+    setDescription('');
+  };
+
+  const handleClose = () => {
+    // Reset form when closing
+    setRating(0);
+    setHoveredRating(0);
+    setTitle('');
+    setDescription('');
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="modal-overlay animate-fadeIn" onClick={handleClose}>
+      <div className="modal-content review-modal animate-slideUp" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3 className="modal-title">Leave a Review</h3>
+          <button className="modal-close" onClick={handleClose}>
+            ×
+          </button>
+        </div>
+        
+        <div className="modal-body">
+          {appointmentDetails && (
+            <div className="doctor-info">
+              <h4 className="doctor-review-name">
+                {appointmentDetails.doctor?.fullName || "Unknown Doctor"}
+              </h4>
+              <p className="appointment-date">
+                Appointment on {new Date(appointmentDetails.start.replace(" ", "T")).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+                })}
+              </p>
+            </div>
+          )}
+
+          <div className="review-form">
+            <div className="form-group">
+              <label className="form-label">Rating *</label>
+              <div className="star-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    className={`star ${star <= (hoveredRating || rating) ? 'star-filled' : 'star-empty'}`}
+                    onClick={() => setRating(star)}
+                    onMouseEnter={() => setHoveredRating(star)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                  >
+                    ★
+                  </button>
+                ))}
+              </div>
+              <p className="rating-text">
+                {rating > 0 && (
+                  <span>
+                    {rating === 1 && "Poor"}
+                    {rating === 2 && "Fair"}
+                    {rating === 3 && "Good"}
+                    {rating === 4 && "Very Good"}
+                    {rating === 5 && "Excellent"}
+                  </span>
+                )}
+              </p>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="review-title">Review Title *</label>
+              <input
+                id="review-title"
+                type="text"
+                className="form-input"
+                placeholder="Summarize your experience..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                maxLength={100}
+              />
+              <p className="character-count">{title.length}/100</p>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="review-description">Description (Optional)</label>
+              <textarea
+                id="review-description"
+                className="form-textarea"
+                placeholder="Tell us more about your experience with this doctor..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={4}
+                maxLength={500}
+              />
+              <p className="character-count">{description.length}/500</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="modal-footer">
+          <button className="modal-button cancel-btn" onClick={handleClose}>
+            Cancel
+          </button>
+          <button 
+            className="modal-button confirm-btn" 
+            onClick={handleSubmitReview}
+            disabled={rating === 0 || title.trim() === ''}
+          >
+            Submit Review
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Toast = ({ message, type, isVisible, onClose }) => {
   useEffect(() => {
     if (isVisible) {
@@ -90,6 +237,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [toast, setToast] = useState({ message: '', type: '', isVisible: false });
 
@@ -157,6 +305,53 @@ export default function Dashboard() {
     }
   };
 
+  const handleLeaveReview = (appointment) => {
+    setSelectedAppointment(appointment);
+    setReviewModalOpen(true);
+  };
+
+  const closeReviewModal = () => {
+    setReviewModalOpen(false);
+    setSelectedAppointment(null);
+  };
+
+  const handleSubmitReview = async (reviewData) => {
+    try {
+      // Here you would typically call your review API service
+      // const response = await submitReview(reviewData);
+      // For now, we'll just show a success message
+      console.log('Review submitted:', reviewData);
+      
+      showToast("Review submitted successfully! Thank you for your feedback.", "success");
+      closeReviewModal();
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      showToast("Failed to submit review. Please try again.", "error");
+    }
+  };
+
+  const getStatusDisplay = (status) => {
+    switch (status?.toUpperCase()) {
+      case 'COMPLETED':
+        return { text: 'Completed', className: 'status-completed' };
+      case 'CANCELLED':
+        return { text: 'Cancelled', className: 'status-cancelled' };
+      case 'SCHEDULED':
+        return { text: 'Upcoming', className: 'status-upcoming' };
+      default:
+        return { text: 'Upcoming', className: 'status-upcoming' };
+    }
+  };
+
+  const isAppointmentCompleted = (appointment) => {
+    return appointment.status?.toUpperCase() === 'COMPLETED';
+  };
+
+  const canCancelAppointment = (appointment) => {
+    const status = appointment.status?.toUpperCase();
+    return status !== 'COMPLETED' && status !== 'CANCELLED';
+  };
+
   if (loading) {
     return (
       <div className="loading animate-fadeIn">
@@ -195,7 +390,7 @@ export default function Dashboard() {
         <div className="dashboard-cards animate-fadeIn">
           <div className="dashboard-card animate-slideUp">
             <div className="card-header">
-              <div className="card-title">Upcoming Appointments</div>
+              <div className="card-title">Total Appointments</div>
               <div className="card-description">Your scheduled appointments</div>
             </div>
             <div className="card-content">
@@ -208,7 +403,7 @@ export default function Dashboard() {
         
         <div className="appointments-section animate-fadeIn">
           <div className="section-header">
-            <h2 className="section-title">Your Upcoming Appointments</h2>
+            <h2 className="section-title">Your Appointments</h2>
           </div>
           
           {appointments.length > 0 ? (
@@ -216,6 +411,9 @@ export default function Dashboard() {
               {appointments.map((appointment, index) => {
                 const startDate = new Date(appointment.start.replace(" ", "T"));
                 const endDate = new Date(appointment.end.replace(" ", "T"));
+                const statusInfo = getStatusDisplay(appointment.status);
+                const isCompleted = isAppointmentCompleted(appointment);
+                const canCancel = canCancelAppointment(appointment);
                 
                 return (
                   <div 
@@ -234,7 +432,9 @@ export default function Dashboard() {
                             </p>
                           </div>
                           <div className="appointment-status">
-                            <span className="status-badge">Upcoming</span>
+                            <span className={`status-badge ${statusInfo.className}`}>
+                              {statusInfo.text}
+                            </span>
                           </div>
                         </div>
                         <p className="appointment-reason">
@@ -260,15 +460,28 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <div className="appointment-actions">
-                        <button className="action-button reschedule-button animate-fadeIn">
-                          Reschedule
-                        </button>
-                        <button
-                          className="action-button cancel-button animate-fadeIn"
-                          onClick={() => openCancelModal(appointment)}
-                        >
-                          Cancel
-                        </button>
+                        {isCompleted ? (
+                          <button 
+                            className="action-button review-button animate-fadeIn"
+                            onClick={() => handleLeaveReview(appointment)}
+                          >
+                            Leave a Review
+                          </button>
+                        ) : (
+                          <>
+                            <button className="action-button reschedule-button animate-fadeIn">
+                              Reschedule
+                            </button>
+                            {canCancel && (
+                              <button
+                                className="action-button cancel-button animate-fadeIn"
+                                onClick={() => openCancelModal(appointment)}
+                              >
+                                Cancel
+                              </button>
+                            )}
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -283,7 +496,7 @@ export default function Dashboard() {
                 No Appointments
               </h3>
               <p className="empty-message animate-fadeIn delay-100">
-                You don't have any upcoming appointments.
+                You don't have any appointments.
               </p>
               <Link to="/appointments/new">
                 <button className="book-button animate-slideUp delay-150">
@@ -302,6 +515,12 @@ export default function Dashboard() {
         appointmentDetails={selectedAppointment}
       />
 
+      <ReviewModal
+        isOpen={reviewModalOpen}
+        onClose={closeReviewModal}
+        onSubmit={handleSubmitReview}
+        appointmentDetails={selectedAppointment}
+      />
 
       <Toast
         message={toast.message}
@@ -309,8 +528,6 @@ export default function Dashboard() {
         isVisible={toast.isVisible}
         onClose={hideToast}
       />
-
-
     </>
   );
 }
