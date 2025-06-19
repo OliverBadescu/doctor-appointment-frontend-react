@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../services/state/userState';
 import { getAllPatientAppointments, deleteAppointment } from '../services/api/appointmentService';
+import { addReview } from '../services/api/reviewService'; 
 
 const CancelConfirmationModal = ({ isOpen, onClose, onConfirm, appointmentDetails }) => {
   if (!isOpen) return null;
@@ -73,18 +74,17 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
       alert('Please enter a title for your review');
       return;
     }
-
     const reviewData = {
-      appointmentId: appointmentDetails?.id,
-      doctorId: appointmentDetails?.doctor?.id,
-      rating,
+      description: description.trim(), 
       title: title.trim(),
-      description: description.trim()
+      rating,
+      userId: appointmentDetails?.user.id,
+      doctorId: appointmentDetails?.doctor?.id,
     };
 
     onSubmit(reviewData);
     
-    // Reset form
+
     setRating(0);
     setHoveredRating(0);
     setTitle('');
@@ -92,7 +92,6 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
   };
 
   const handleClose = () => {
-    // Reset form when closing
     setRating(0);
     setHoveredRating(0);
     setTitle('');
@@ -317,16 +316,20 @@ export default function Dashboard() {
 
   const handleSubmitReview = async (reviewData) => {
     try {
-      // Here you would typically call your review API service
-      // const response = await submitReview(reviewData);
-      // For now, we'll just show a success message
-      console.log('Review submitted:', reviewData);
       
-      showToast("Review submitted successfully! Thank you for your feedback.", "success");
-      closeReviewModal();
+      const response = await addReview(reviewData);
+      
+      if (response.success) {
+        showToast("Review submitted successfully! Thank you for your feedback.", "success");
+        setTimeout(() => {
+          closeReviewModal();
+        }, 100);
+      } else {
+        showToast(response.message || "Failed to submit review. Please try again.", "error");
+      }
     } catch (error) {
       console.error("Error submitting review:", error);
-      showToast("Failed to submit review. Please try again.", "error");
+      showToast("An error occurred while submitting your review. Please try again.", "error");
     }
   };
 
