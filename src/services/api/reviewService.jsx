@@ -14,3 +14,7 @@ import {request} from "./api-utils.jsx";
   export function deleteReview(data, id){
     return request(baseUrl +`/updateReview/${id}`, 'PUT', data );
   }
+
+  export function getReviewsByDoctorId(id){
+    return request(baseUrl+ `/getByDoctorId/${id}`, 'GET');
+  }

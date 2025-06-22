@@ -204,6 +204,74 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
   );
 };
 
+// New Success Modal Component
+const ReviewSuccessModal = ({ isOpen, onClose, doctorName, rating }) => {
+  if (!isOpen) return null;
+
+  const getRatingText = (rating) => {
+    switch (rating) {
+      case 1: return "Poor";
+      case 2: return "Fair";
+      case 3: return "Good";
+      case 4: return "Very Good";
+      case 5: return "Excellent";
+      default: return "";
+    }
+  };
+
+  return (
+    <div className="modal-overlay animate-fadeIn" onClick={onClose}>
+      <div className="modal-content success-modal animate-slideUp" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3 className="modal-title">Review Submitted Successfully!</h3>
+          <button className="modal-close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+        
+        <div className="modal-body">
+          <div className="success-icon">
+            ✅
+          </div>
+          <div className="success-content">
+            <h4 className="success-title">Thank you for your feedback!</h4>
+            <p className="success-message">
+              Your review for <strong>{doctorName}</strong> has been submitted successfully.
+            </p>
+            <div className="review-summary">
+              <div className="submitted-rating">
+                <span className="rating-label">Your Rating:</span>
+                <div className="rating-display">
+                  <div className="stars">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span 
+                        key={star} 
+                        className={`star ${star <= rating ? 'star-filled' : 'star-empty'}`}
+                      >
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <span className="rating-text">({getRatingText(rating)})</span>
+                </div>
+              </div>
+            </div>
+            <p className="success-note">
+              Your review will help other patients make informed decisions about their healthcare.
+            </p>
+          </div>
+        </div>
+        
+        <div className="modal-footer">
+          <button className="modal-button confirm-btn success-btn" onClick={onClose}>
+            Great!
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Toast = ({ message, type, isVisible, onClose }) => {
   useEffect(() => {
     if (isVisible) {
@@ -237,7 +305,9 @@ export default function Dashboard() {
   const [error, setError] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [submittedReview, setSubmittedReview] = useState(null); 
   const [toast, setToast] = useState({ message: '', type: '', isVisible: false });
 
   useEffect(() => {
@@ -314,16 +384,27 @@ export default function Dashboard() {
     setSelectedAppointment(null);
   };
 
+  const closeSuccessModal = () => {
+    setSuccessModalOpen(false);
+    setSubmittedReview(null);
+  };
+
   const handleSubmitReview = async (reviewData) => {
     try {
-      
       const response = await addReview(reviewData);
       
       if (response.success) {
-        showToast("Review submitted successfully! Thank you for your feedback.", "success");
-        setTimeout(() => {
-          closeReviewModal();
-        }, 100);
+        // Store review data for success modal
+        setSubmittedReview({
+          doctorName: selectedAppointment?.doctor?.fullName || "Unknown Doctor",
+          rating: reviewData.rating
+        });
+        
+        // Close review modal first
+        closeReviewModal();
+        
+        // Show success modal
+        setSuccessModalOpen(true);
       } else {
         showToast(response.message || "Failed to submit review. Please try again.", "error");
       }
@@ -523,6 +604,13 @@ export default function Dashboard() {
         onClose={closeReviewModal}
         onSubmit={handleSubmitReview}
         appointmentDetails={selectedAppointment}
+      />
+
+      <ReviewSuccessModal
+        isOpen={successModalOpen}
+        onClose={closeSuccessModal}
+        doctorName={submittedReview?.doctorName}
+        rating={submittedReview?.rating}
       />
 
       <Toast

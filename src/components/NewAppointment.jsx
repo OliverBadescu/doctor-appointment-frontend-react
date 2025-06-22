@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllClinic } from '../services/api/clinicService';
 import { getAllDoctors, getDoctorAvailability } from '../services/api/doctorService';
 import { createAppointment } from '../services/api/appointmentService';
+import { getReviewsByDoctorId } from '../services/api/reviewService';
 import { UserContext } from '../services/state/userState';
 import { 
   Dialog, 
@@ -12,9 +13,20 @@ import {
   DialogTitle,
   Button,
   CircularProgress,
-  Fade
+  Fade,
+  Card,
+  CardContent,
+  Typography,
+  Rating,
+  Box,
+  Collapse,
+  IconButton
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import StarIcon from '@mui/icons-material/Star';
+import PersonIcon from '@mui/icons-material/Person';
 
 export default function NewAppointment() {
   const navigate = useNavigate();
@@ -30,8 +42,13 @@ export default function NewAppointment() {
   const [reason, setReason] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const [error, setError] = useState("");
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
+  const [doctorReviews, setDoctorReviews] = useState([]);
+  const [reviewsExpanded, setReviewsExpanded] = useState(false);
+  const [currentReviewPage, setCurrentReviewPage] = useState(1);
+  const reviewsPerPage = 3;
 
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [appointmentDetails, setAppointmentDetails] = useState(null);
@@ -76,6 +93,9 @@ export default function NewAppointment() {
         setDate("");
         setTime("");
         setAvailableTimeSlots([]);
+        setDoctorReviews([]);
+        setReviewsExpanded(false);
+        setCurrentReviewPage(1);
       }
     } else {
       setFilteredDoctors([]);
@@ -84,6 +104,9 @@ export default function NewAppointment() {
       setDate("");
       setTime("");
       setAvailableTimeSlots([]);
+      setDoctorReviews([]);
+      setReviewsExpanded(false);
+      setCurrentReviewPage(1);
     }
   }, [selectedClinic, doctors, selectedDoctor]);
 
@@ -122,6 +145,38 @@ export default function NewAppointment() {
     
     fetchDoctorAvailability();
   }, [selectedDoctor, date]);
+
+
+  useEffect(() => {
+    async function fetchDoctorReviews() {
+      if (selectedDoctor) {
+        setReviewsLoading(true);
+        setDoctorReviews([]);
+        
+        try {
+          const response = await getReviewsByDoctorId(selectedDoctor);
+          
+          if (response.success && response.body) {
+         
+            const reviews = Array.isArray(response.body) ? response.body : 
+                           response.body.list ? response.body.list : [];
+            setDoctorReviews(reviews);
+            setCurrentReviewPage(1); 
+          } else {
+
+            setDoctorReviews([]);
+          }
+        } catch (err) {
+          console.error("Error fetching doctor reviews:", err);
+          setDoctorReviews([]);
+        } finally {
+          setReviewsLoading(false);
+        }
+      }
+    }
+    
+    fetchDoctorReviews();
+  }, [selectedDoctor]);
 
   const generateAvailableSlots = (timesList) => {
     return timesList.map(range => {
@@ -167,6 +222,8 @@ export default function NewAppointment() {
     setDate("");
     setTime("");
     setAvailableTimeSlots([]);
+    setReviewsExpanded(false);
+    setCurrentReviewPage(1);
     
     if (doctorId) {
       const doctor = doctors.find(doc => doc.id == doctorId);
@@ -175,6 +232,8 @@ export default function NewAppointment() {
       }
     } else {
       setSelectedDoctorName("");
+      setDoctorReviews([]);
+      setCurrentReviewPage(1);
     }
   };
 
@@ -220,6 +279,34 @@ export default function NewAppointment() {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  const calculateTotalPages = (totalReviews) => {
+    return Math.ceil(totalReviews / reviewsPerPage);
+  };
+
+  const getCurrentPageReviews = () => {
+    const startIndex = (currentReviewPage - 1) * reviewsPerPage;
+    const endIndex = startIndex + reviewsPerPage;
+    return doctorReviews.slice(startIndex, endIndex);
+  };
+
+  const handleReviewPageChange = (newPage) => {
+    setCurrentReviewPage(newPage);
+  };
+
+  const calculateAverageRating = (reviews) => {
+    if (!reviews || reviews.length === 0) return 0;
+    const total = reviews.reduce((sum, review) => sum + (review.rating || 0), 0);
+    return (total / reviews.length).toFixed(1);
+  };
+
+  const formatReviewDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -248,7 +335,6 @@ export default function NewAppointment() {
       const response = await createAppointment(appointmentData);
       
       if (response.success) {
-        // Store appointment details for display in success modal
         setAppointmentDetails({
           doctor: selectedDoctorName,
           date: formatDate(date),
@@ -256,7 +342,6 @@ export default function NewAppointment() {
           clinic: clinics.find(c => c.id == selectedClinic)?.name || "Selected Clinic"
         });
         
-        // Show success modal instead of alert
         setSuccessDialogOpen(true);
       } else {
         setError("Failed to book appointment: " + response.message);
@@ -276,54 +361,6 @@ export default function NewAppointment() {
   
   const today = new Date().toISOString().split("T")[0];
 
-  useEffect(() => {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = `
-      .weekend-disabled input[type="date"]::-webkit-calendar-picker-indicator {
-        position: relative;
-      }
-      .form-input[type="date"]:disabled {
-        background-color: #f5f5f5;
-        cursor: not-allowed;
-      }
-      .time-loading {
-        opacity: 0.6;
-      }
-      .success-icon {
-        font-size: 64px;
-        color: #4caf50;
-        margin-bottom: 16px;
-      }
-      .success-dialog-content {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 24px;
-        text-align: center;
-      }
-      .appointment-details {
-        margin: 16px 0;
-        padding: 16px;
-        background-color: #f5f9ff;
-        border-radius: 8px;
-        width: 100%;
-        text-align: left;
-      }
-      .detail-row {
-        display: flex;
-        margin-bottom: 8px;
-      }
-      .detail-label {
-        font-weight: 500;
-        width: 100px;
-      }
-    `;
-    document.head.appendChild(styleElement);
-    
-    return () => {
-      document.head.removeChild(styleElement);
-    };
-  }, []);
 
   if (isLoading && (!clinics.length || !doctors.length)) {
     return <div className="loading-container animate-fadeIn">Loading appointment data...</div>;
@@ -388,6 +425,140 @@ export default function NewAppointment() {
                   ))}
                 </select>
               </div>
+
+              {/* Doctor Reviews Section */}
+              {selectedDoctor && (
+                <div className="reviews-section animate-fadeIn">
+                  <div 
+                    className="reviews-header"
+                    onClick={() => setReviewsExpanded(!reviewsExpanded)}
+                  >
+                    <div className="reviews-summary">
+                      <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
+                        Doctor Reviews
+                      </Typography>
+                      {reviewsLoading ? (
+                        <CircularProgress size={20} />
+                      ) : doctorReviews.length > 0 ? (
+                        <div className="rating-display">
+                          <Rating 
+                            value={parseFloat(calculateAverageRating(doctorReviews))} 
+                            readOnly 
+                            precision={0.1}
+                            size="small"
+                          />
+                          <Typography variant="body2" color="text.secondary">
+                            {calculateAverageRating(doctorReviews)} ({doctorReviews.length} review{doctorReviews.length !== 1 ? 's' : ''})
+                          </Typography>
+                        </div>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          No reviews yet
+                        </Typography>
+                      )}
+                    </div>
+                    <IconButton size="small">
+                      {reviewsExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </IconButton>
+                  </div>
+                  
+                  <Collapse in={reviewsExpanded}>
+                    <Box sx={{ mt: 2 }}>
+                      {reviewsLoading ? (
+                        <div className="reviews-loading">
+                          <CircularProgress size={24} />
+                          <Typography sx={{ mt: 1 }}>Loading reviews...</Typography>
+                        </div>
+                      ) : doctorReviews.length > 0 ? (
+                        <div>
+                          {getCurrentPageReviews().map((review, index) => (
+                            <div key={review.id || index} className="review-card">
+                              <div className="review-header">
+                                <div className="reviewer-info">
+                                  <PersonIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                                  <Typography variant="subtitle2">
+                                    Patient #{review.userId || 'Anonymous'}
+                                  </Typography>
+                                  <Rating value={review.rating || 0} readOnly size="small" />
+                                </div>
+                                <Typography variant="caption" className="review-date">
+                                  {review.createdAt ? formatReviewDate(review.createdAt) : 'Recent'}
+                                </Typography>
+                              </div>
+                              {review.title && (
+                                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                                  {review.title}
+                                </Typography>
+                              )}
+                              {review.description && (
+                                <Typography variant="body2" className="review-text">
+                                  "{review.description}"
+                                </Typography>
+                              )}
+                            </div>
+                          ))}
+                          
+                          {/* Pagination Controls */}
+                          {doctorReviews.length > reviewsPerPage && (
+                            <div className="pagination-container">
+                              <div className="pagination-info">
+                                <Typography variant="body2" color="text.secondary">
+                                  Showing {Math.min((currentReviewPage - 1) * reviewsPerPage + 1, doctorReviews.length)} - {Math.min(currentReviewPage * reviewsPerPage, doctorReviews.length)} of {doctorReviews.length} reviews
+                                </Typography>
+                              </div>
+                              <div className="pagination-controls">
+                                <Button
+                                  size="small"
+                                  disabled={currentReviewPage === 1}
+                                  onClick={() => handleReviewPageChange(currentReviewPage - 1)}
+                                  sx={{ minWidth: 'auto', px: 1 }}
+                                >
+                                  Previous
+                                </Button>
+                                
+                                <div className="page-numbers">
+                                  {Array.from({ length: calculateTotalPages(doctorReviews.length) }, (_, i) => i + 1).map((page) => (
+                                    <Button
+                                      key={page}
+                                      size="small"
+                                      variant={page === currentReviewPage ? "contained" : "outlined"}
+                                      onClick={() => handleReviewPageChange(page)}
+                                      sx={{ 
+                                        minWidth: '32px', 
+                                        width: '32px', 
+                                        height: '32px', 
+                                        mx: 0.25,
+                                        fontSize: '0.875rem'
+                                      }}
+                                    >
+                                      {page}
+                                    </Button>
+                                  ))}
+                                </div>
+                                
+                                <Button
+                                  size="small"
+                                  disabled={currentReviewPage === calculateTotalPages(doctorReviews.length)}
+                                  onClick={() => handleReviewPageChange(currentReviewPage + 1)}
+                                  sx={{ minWidth: 'auto', px: 1 }}
+                                >
+                                  Next
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="no-reviews">
+                          <Typography variant="body2">
+                            This doctor hasn't received any reviews yet. Be the first to share your experience!
+                          </Typography>
+                        </div>
+                      )}
+                    </Box>
+                  </Collapse>
+                </div>
+              )}
               
               <div className="date-time-container">
                 <div className="form-group weekend-disabled animate-slideUp delay-300">
