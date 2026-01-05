@@ -8,12 +8,19 @@ export function UserProvider({ children }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [user, setUser] = useState({
-    email: "",
-    fullName: "",
-    id: 0,
-    jwtToken: "",
-    userRole: ""
+  const [isAuthReady, setIsAuthReady] = useState(false);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      return JSON.parse(savedUser);
+    }
+    return {
+      email: "",
+      fullName: "",
+      id: 0,
+      jwtToken: "",
+      userRole: ""
+    };
   });
 
   const checkUser = () =>{
@@ -45,12 +52,14 @@ export function UserProvider({ children }) {
         throw err;
       }
     };
+    setIsAuthReady(true);
     return () => {
       window.fetch = originalFetch;
     };
   }, [user.jwtToken]);
 
   function handleLogout() {
+    localStorage.removeItem("user");
     setUser({
       email: "",
       fullName: "",
@@ -73,6 +82,7 @@ export function UserProvider({ children }) {
       } else {
         setErrors([]);
         setUser(data.body);
+        localStorage.setItem("user", JSON.stringify(data.body));
         return { success: true, role: data.body.userRole };
       }
     } catch {
@@ -110,6 +120,7 @@ export function UserProvider({ children }) {
         user,
         loading,
         errors,
+        isAuthReady,
         setErrors,
         handleLogin,
         handleLogout,

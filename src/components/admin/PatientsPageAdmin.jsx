@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../../services/state/userState';
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
   TextField, IconButton, Typography, Grid, Toolbar, AppBar, Paper
@@ -8,6 +9,7 @@ import { Add as AddIcon, Edit as EditIcon, Delete as DeleteIcon, Close as CloseI
 import { getAllUsers, deleteUser, register, updateUser } from '../../services/api/userService';
 
 export default function PatientsPageAdmin() {
+  const { isAuthReady } = useContext(UserContext);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
@@ -23,7 +25,10 @@ export default function PatientsPageAdmin() {
       setRows(res.body.list || []);
     } finally { setLoading(false); }
   };
-  useEffect(() => { fetch(); }, []);
+  useEffect(() => {
+    if (!isAuthReady) return;
+    fetch();
+  }, [isAuthReady]);
 
   const openCreate = () => { 
     setEditing(null); 

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../../services/state/userState';
 import { Grid, Card, CardContent, Box, Typography } from '@mui/material';
 import { LineChart, PieChart } from '@mui/x-charts';
 import {getTotalAppointments} from '../../services/api/appointmentService';
@@ -7,12 +8,15 @@ import { getTotalDoctors } from '../../services/api/doctorService';
 import { totalUsers } from '../../services/api/userService';
 
 export default function AdminHomePage() {
+  const { isAuthReady } = useContext(UserContext);
   const [users, setUsers] = useState(0);
   const [doctors, setDoctors] = useState(0);
   const [clinics, setClinics] = useState(0);
   const [appointments, setAppointments] = useState(0);
 
   useEffect(() => {
+    if (!isAuthReady) return;
+
     async function fetchData() {
       const u = await totalUsers();
       const d = await getTotalDoctors();
@@ -25,7 +29,7 @@ export default function AdminHomePage() {
       setAppointments(a.body);
     }
     fetchData();
-  }, []);
+  }, [isAuthReady]);
 
   const metrics = [
     { label: 'Users', value: users },

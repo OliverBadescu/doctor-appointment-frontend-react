@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../../services/state/userState';
 import {
   Box,
   Button,
@@ -30,6 +31,7 @@ import {
 } from '../../services/api/clinicService';
 
 export default function ClinicsPageAdmin() {
+  const { isAuthReady } = useContext(UserContext);
   const [clinics, setClinics] = useState([]);
   const [loading, setLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -49,8 +51,9 @@ export default function ClinicsPageAdmin() {
   };
 
   useEffect(() => {
+    if (!isAuthReady) return;
     fetchClinics();
-  }, []);
+  }, [isAuthReady]);
 
   const handleOpenCreate = () => {
     setEditingClinic(null);

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../../services/state/userState';
 import {
   Box, Button, Dialog, DialogActions, DialogContent, DialogTitle,
   TextField, IconButton, Typography, Grid, Toolbar, AppBar,
@@ -15,6 +16,7 @@ import {
 import { getAllClinic } from '../../services/api/clinicService';
 
 export default function DoctorsPageAdmin() {
+  const { isAuthReady } = useContext(UserContext);
   const [rows, setRows] = useState([]);
   const [clinics, setClinics] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -41,13 +43,13 @@ export default function DoctorsPageAdmin() {
         getAllClinic()
       ]);
 
-      
+
       const clinicMap = {};
       (clinicsRes.body.list || []).forEach(clinic => {
         clinicMap[clinic.id] = clinic.name;
       });
 
-      
+
       setClinics(clinicsRes.body.list || []);
       const doctorsWithClinicNames = (doctorsRes.body.list || []).map(doctor => ({
         ...doctor,
@@ -56,7 +58,7 @@ export default function DoctorsPageAdmin() {
 
 
       setRows(doctorsWithClinicNames);
-      
+
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -64,9 +66,10 @@ export default function DoctorsPageAdmin() {
     }
   };
 
-  useEffect(() => { 
-    fetchData(); 
-  }, []);
+  useEffect(() => {
+    if (!isAuthReady) return;
+    fetchData();
+  }, [isAuthReady]);
 
   const validateForm = () => {
     const newErrors = {};

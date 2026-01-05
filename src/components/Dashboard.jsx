@@ -298,7 +298,7 @@ const Toast = ({ message, type, isVisible, onClose }) => {
 };
 
 export default function Dashboard() {
-  const { user } = useContext(UserContext);
+  const { user, isAuthReady } = useContext(UserContext);
   const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -311,6 +311,8 @@ export default function Dashboard() {
   const [toast, setToast] = useState({ message: '', type: '', isVisible: false });
 
   useEffect(() => {
+    if (!isAuthReady) return;
+
     if (!user || user.id === 0) {
       navigate('/login');
       return;
@@ -335,7 +337,7 @@ export default function Dashboard() {
     };
 
     fetchAppointments();
-  }, [user, navigate]);
+  }, [user, navigate, isAuthReady]);
 
   const showToast = (message, type) => {
     setToast({ message, type, isVisible: true });
