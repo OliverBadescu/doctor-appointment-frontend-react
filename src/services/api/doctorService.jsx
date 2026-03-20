@@ -20,21 +20,3 @@ import {request} from "./api-utils.jsx";
     return request(baseUrl+`/available/${doctorId}`, 'POST', data);
   }
 
-  export function getTotalDoctors(){
-    return request(baseUrl+'/getTotalDoctors', 'GET');
-  }
-
-  export function createDoctor(data){
-    return request(baseUrl+'/addDoctor', 'POST', data);
-
-  }
-
-  export function deleteDoctor(id){ 
-    return request(baseUrl+`/deleteDoctor/${id}`, 'DELETE')
-
-  }
-
-  export function updateDoctor(id, data){
-    return request(baseUrl+`/updateDoctor/${id}`, 'PUT', data);
-    
-  }

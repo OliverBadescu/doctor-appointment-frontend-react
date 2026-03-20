@@ -17,7 +17,7 @@ export default function Navbar() {
   return (
     <nav className="navbar-container">
       <div className="navbar-inner-container">
-        <Link to={user.userRole === "ADMIN" ? "/admin-home" : "/"} className="logo-container">
+        <Link to="/" className="logo-container">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -38,24 +38,6 @@ export default function Navbar() {
         <div className="login-container-navbar">
           {isLoggedIn ? (
             <>
-              {user.userRole === "ADMIN" ? (
-                <>
-                <Link to="/" className="animate-fadeIn" >
-                  <Button variant="ghost">Clinics</Button>
-                </Link>
-                <Link to="/" className="animate-fadeIn" >
-                  <Button variant="ghost">Doctors</Button>
-                </Link>
-                <Link to="/" className="animate-fadeIn" >
-                  <Button variant="ghost">Patients</Button>
-                </Link>
-                <Button onClick={onLogoutClick} className="animate-fadeIn" >
-                  Logout
-                 </Button>
-                </>
-              ) : 
-              (<>
-              
               <Link to="/appointment" className="animate-fadeIn" >
                 <Button variant="ghost">Appointments</Button>
               </Link>
@@ -65,8 +47,6 @@ export default function Navbar() {
               <Button onClick={onLogoutClick} className="animate-fadeIn" >
                 Logout
               </Button>
-              
-              </>)}
             </>
           ) : (
             <>

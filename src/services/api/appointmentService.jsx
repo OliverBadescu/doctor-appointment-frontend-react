@@ -31,9 +31,6 @@ export function getDoctorAppointments(doctorId) {
   return request(baseUrl+`/doctor/${doctorId}`, 'GET');
 }
 
-export function getTotalAppointments(){
-  return request(baseUrl+'/getTotalAppointments', 'GET');
-}
 
 export function updateStatus(status, appointmentId){
   return request(baseUrl+`/updateStatus/${appointmentId}`, 'PUT', status);
