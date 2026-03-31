@@ -502,11 +502,27 @@ export default function Dashboard() {
                 const canCancel = canCancelAppointment(appointment);
                 
                 return (
-                  <div 
-                    key={appointment.id} 
+                  <div
+                    key={appointment.id}
                     className={`appointment-card animate-slideUp`}
                   >
                     <div className="appointment-layout">
+                      {/* Visual date block */}
+                      <div className="date-block">
+                        <span className="date-block-weekday">
+                          {startDate.toLocaleDateString('en-US', { weekday: 'short' })}
+                        </span>
+                        <span className="date-block-day">
+                          {startDate.getDate()}
+                        </span>
+                        <span className="date-block-month">
+                          {startDate.toLocaleDateString('en-US', { month: 'short' })}
+                        </span>
+                        <span className="date-block-time">
+                          {startDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                        </span>
+                      </div>
+
                       <div className="appointment-details">
                         <div className="appointment-header">
                           <div>
@@ -528,48 +544,33 @@ export default function Dashboard() {
                         </p>
                         <div className="appointment-time-info">
                           <div className="time-detail">
-                            <p className="detail-label">Date</p>
-                            <p className="detail-value">
-                              {startDate.toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                                year: 'numeric'
-                              })}
-                            </p>
-                          </div>
-                          <div className="time-detail">
-                            <p className="detail-label">Time</p>
+                            <p className="detail-label">Duration</p>
                             <p className="detail-value">
                               {startDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - {endDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
                             </p>
                           </div>
                         </div>
                       </div>
-                      <div className="appointment-actions">
+                    </div>
+                    {(isCompleted || canCancel) && (
+                      <div className="appointment-card-footer">
                         {isCompleted ? (
-                          <button 
-                            className="action-button review-button animate-fadeIn"
+                          <button
+                            className="action-button review-button"
                             onClick={() => handleLeaveReview(appointment)}
                           >
                             Leave a Review
                           </button>
-                        ) : (
-                          <>
-                            <button className="action-button reschedule-button animate-fadeIn">
-                              Reschedule
-                            </button>
-                            {canCancel && (
-                              <button
-                                className="action-button cancel-button animate-fadeIn"
-                                onClick={() => openCancelModal(appointment)}
-                              >
-                                Cancel
-                              </button>
-                            )}
-                          </>
-                        )}
+                        ) : canCancel ? (
+                          <button
+                            className="action-button cancel-button"
+                            onClick={() => openCancelModal(appointment)}
+                          >
+                            Cancel Appointment
+                          </button>
+                        ) : null}
                       </div>
-                    </div>
+                    )}
                   </div>
                 );
               })}

@@ -27,6 +27,9 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import StarIcon from '@mui/icons-material/Star';
 import PersonIcon from '@mui/icons-material/Person';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 export default function NewAppointment() {
   const navigate = useNavigate();
@@ -52,6 +55,10 @@ export default function NewAppointment() {
 
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
   const [appointmentDetails, setAppointmentDetails] = useState(null);
+
+  const todayObj = new Date();
+  const [calendarMonth, setCalendarMonth] = useState(todayObj.getMonth() + 1);
+  const [calendarYear, setCalendarYear] = useState(todayObj.getFullYear());
 
   useEffect(() => {
     async function fetchData() {
@@ -235,23 +242,6 @@ export default function NewAppointment() {
       setDoctorReviews([]);
       setCurrentReviewPage(1);
     }
-  };
-
-  const handleDateChange = (e) => {
-    const selectedDate = e.target.value;
-    if (isWeekend(selectedDate)) {
-      return; 
-    }
-    
-    setDate(selectedDate);
-    setTime("");
-    setAvailableTimeSlots([]);
-  };
-
-  const isWeekend = (dateString) => {
-    const dateObj = new Date(dateString);
-    const day = dateObj.getDay();
-    return day === 0 || day === 6; 
   };
 
   const formatTimeForBackend = (timeString) => {
@@ -560,51 +550,120 @@ export default function NewAppointment() {
                 </div>
               )}
               
-              <div className="date-time-container">
-                <div className="form-group weekend-disabled animate-slideUp delay-300">
-                  <label htmlFor="date" className="form-label">Date</label>
-                  <input
-                    id="date"
-                    type="date"
-                    className="form-input"
-                    value={date}
-                    onChange={handleDateChange}
-                    min={today}
-                    required
-                    disabled={!selectedDoctor}
-                  />
-                  {selectedDoctor && (
-                    <small className="form-text text-muted animate-fadeIn">
-                      Weekends are not available for appointments
-                    </small>
-                  )}
-                </div>
-                <div className="form-group animate-slideUp delay-400">
-                  <label htmlFor="time" className="form-label">Time</label>
-                  <select 
-                    id="time" 
-                    className={`form-select ${availabilityLoading ? 'time-loading' : ''}`}
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    disabled={!date || availabilityLoading || availableTimeSlots.length === 0}
-                  >
-                    <option value="">
-                      {!date ? "First select a date" : 
-                       availabilityLoading ? "Loading available times..." :
-                       availableTimeSlots.length === 0 ? "No available slots" : "Select a time"}
-                    </option>
+              {/* Inline Calendar */}
+              <div className="form-group animate-slideUp delay-300">
+                <label className="form-label">Select Date</label>
+                {!selectedDoctor ? (
+                  <div className="calendar-disabled-message">
+                    Please select a doctor first
+                  </div>
+                ) : (
+                  <div className="inline-calendar">
+                    <div className="calendar-nav">
+                      <button
+                        type="button"
+                        className="calendar-nav-btn"
+                        onClick={() => {
+                          const d = new Date(calendarYear, calendarMonth - 1, 1);
+                          setCalendarMonth(d.getMonth() + 1);
+                          setCalendarYear(d.getFullYear());
+                        }}
+                        disabled={calendarYear === todayObj.getFullYear() && calendarMonth === todayObj.getMonth() + 1}
+                      >
+                        <ChevronLeftIcon fontSize="small" />
+                      </button>
+                      <span className="calendar-month-label">
+                        {new Date(calendarYear, calendarMonth, 0).toLocaleString('default', { month: 'long', year: 'numeric' })}
+                      </span>
+                      <button
+                        type="button"
+                        className="calendar-nav-btn"
+                        onClick={() => {
+                          const d = new Date(calendarYear, calendarMonth + 1, 1);
+                          setCalendarMonth(d.getMonth() + 1);
+                          setCalendarYear(d.getFullYear());
+                        }}
+                      >
+                        <ChevronRightIcon fontSize="small" />
+                      </button>
+                    </div>
+                    <div className="calendar-grid">
+                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                        <div key={day} className="calendar-weekday">{day}</div>
+                      ))}
+                      {(() => {
+                        const daysInMonth = new Date(calendarYear, calendarMonth, 0).getDate();
+                        const firstDayOfWeek = new Date(calendarYear, calendarMonth - 1, 1).getDay();
+                        const cells = [];
+                        for (let i = 0; i < firstDayOfWeek; i++) {
+                          cells.push(<div key={`empty-${i}`} className="calendar-day empty" />);
+                        }
+                        for (let day = 1; day <= daysInMonth; day++) {
+                          const dateStr = `${calendarYear}-${String(calendarMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                          const dayOfWeek = new Date(calendarYear, calendarMonth - 1, day).getDay();
+                          const isWeekendDay = dayOfWeek === 0 || dayOfWeek === 6;
+                          const isPast = dateStr < today;
+                          const isSelected = dateStr === date;
+                          const isToday = dateStr === today;
+                          const disabled = isWeekendDay || isPast;
+
+                          cells.push(
+                            <button
+                              key={day}
+                              type="button"
+                              disabled={disabled}
+                              className={`calendar-day${isSelected ? ' selected' : ''}${isToday ? ' today' : ''}${disabled ? ' disabled' : ''}`}
+                              onClick={() => {
+                                setDate(dateStr);
+                                setTime("");
+                                setAvailableTimeSlots([]);
+                              }}
+                            >
+                              {day}
+                            </button>
+                          );
+                        }
+                        return cells;
+                      })()}
+                    </div>
+                    <p className="calendar-hint">Weekends are not available</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Time Slot Grid */}
+              <div className="form-group animate-slideUp delay-400">
+                <label className="form-label">
+                  <AccessTimeIcon sx={{ fontSize: 18, verticalAlign: 'text-bottom', mr: 0.5 }} />
+                  Select Time
+                </label>
+                {!date ? (
+                  <div className="calendar-disabled-message">
+                    Please select a date first
+                  </div>
+                ) : availabilityLoading ? (
+                  <div className="timeslot-loading">
+                    <CircularProgress size={24} />
+                    <span>Loading available times...</span>
+                  </div>
+                ) : availableTimeSlots.length === 0 ? (
+                  <div className="timeslot-empty">
+                    No available slots for this date
+                  </div>
+                ) : (
+                  <div className="timeslot-grid">
                     {availableTimeSlots.map((slot) => (
-                      <option key={slot} value={slot}>
+                      <button
+                        key={slot}
+                        type="button"
+                        className={`timeslot-pill${time === slot ? ' selected' : ''}`}
+                        onClick={() => setTime(slot)}
+                      >
                         {slot}
-                      </option>
+                      </button>
                     ))}
-                  </select>
-                  {date && availableTimeSlots.length === 0 && !availabilityLoading && (
-                    <small className="form-text text-muted animate-fadeIn">
-                      No available appointment slots for this date
-                    </small>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
               
               <div className="form-group animate-slideUp delay-500">
