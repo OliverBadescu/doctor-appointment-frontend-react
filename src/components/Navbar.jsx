@@ -1,23 +1,106 @@
 import { useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import { UserContext } from "../services/state/userState";
+import { DoctorContext } from "../services/state/doctorContext";
 
 export default function Navbar() {
-  const { user, handleLogout } = useContext(UserContext);
+  const { user, handleLogout: handleUserLogout } = useContext(UserContext);
+  const { doctor, handleLogout: handleDoctorLogout } = useContext(DoctorContext);
   const navigate = useNavigate();
-  
-  const isLoggedIn = user && user.id !== 0;
-  
-  const onLogoutClick = () => {
-    handleLogout();
+  const location = useLocation();
+
+  // AdminLayout renders its own AppBar + sidebar, so suppress the public
+  // navbar on /admin/* to avoid two stacked headers.
+  if (location.pathname.startsWith("/admin")) {
+    return null;
+  }
+
+  const isAdmin = user?.userRole === "ADMIN" && user?.id;
+  const isClient = user?.id && !isAdmin;
+  const isDoctor = Boolean(doctor?.jwtToken);
+
+  const onUserLogoutClick = () => {
+    handleUserLogout();
     navigate("/");
+  };
+
+  const logoTo = isAdmin
+    ? "/admin/home"
+    : isDoctor
+    ? "/doctor/dashboard"
+    : "/";
+
+  const renderLinks = () => {
+    if (isAdmin) {
+      return (
+        <>
+          <Link to="/admin/clinics" className="animate-fadeIn">
+            <Button variant="ghost">Clinics</Button>
+          </Link>
+          <Link to="/admin/doctors" className="animate-fadeIn">
+            <Button variant="ghost">Doctors</Button>
+          </Link>
+          <Link to="/admin/patients" className="animate-fadeIn">
+            <Button variant="ghost">Patients</Button>
+          </Link>
+          <Button onClick={onUserLogoutClick} className="animate-fadeIn">
+            Logout
+          </Button>
+        </>
+      );
+    }
+
+    if (isDoctor) {
+      return (
+        <>
+          <Link to="/doctor/dashboard" className="animate-fadeIn">
+            <Button variant="ghost">Dashboard</Button>
+          </Link>
+          <Button onClick={handleDoctorLogout} className="animate-fadeIn">
+            Logout
+          </Button>
+        </>
+      );
+    }
+
+    if (isClient) {
+      return (
+        <>
+          <Link to="/appointment" className="animate-fadeIn">
+            <Button variant="ghost">Appointments</Button>
+          </Link>
+          <Link to="/appointments/new" className="animate-fadeIn">
+            <Button variant="ghost">New Appointment</Button>
+          </Link>
+          <Link to="/profile" className="animate-fadeIn">
+            <Button variant="ghost">Profile</Button>
+          </Link>
+          <Button onClick={onUserLogoutClick} className="animate-fadeIn">
+            Logout
+          </Button>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <Link to="/login" className="animate-fadeIn">
+          <Button variant="ghost">Login</Button>
+        </Link>
+        <Link to="/signup" className="animate-fadeIn">
+          <Button variant="default" className="signup-btn">
+            Sign Up
+          </Button>
+        </Link>
+      </>
+    );
   };
 
   return (
     <nav className="navbar-container">
       <div className="navbar-inner-container">
-        <Link to={user.userRole === "ADMIN" ? "/admin-home" : "/"} className="logo-container">
+        <Link to={logoTo} className="logo-container">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -33,54 +116,7 @@ export default function Navbar() {
           <span className="logo-bold animate-fadeIn">EasyApptCare</span>
         </Link>
 
-        
-
-        <div className="login-container-navbar">
-          {isLoggedIn ? (
-            <>
-              {user.userRole === "ADMIN" ? (
-                <>
-                <Link to="/" className="animate-fadeIn" >
-                  <Button variant="ghost">Clinics</Button>
-                </Link>
-                <Link to="/" className="animate-fadeIn" >
-                  <Button variant="ghost">Doctors</Button>
-                </Link>
-                <Link to="/" className="animate-fadeIn" >
-                  <Button variant="ghost">Patients</Button>
-                </Link>
-                <Button onClick={onLogoutClick} className="animate-fadeIn" >
-                  Logout
-                 </Button>
-                </>
-              ) : 
-              (<>
-              
-              <Link to="/appointment" className="animate-fadeIn" >
-                <Button variant="ghost">Appointments</Button>
-              </Link>
-              <Link to="/appointments/new" className="animate-fadeIn" >
-                <Button variant="ghost">New Appointment</Button>
-              </Link>
-              <Button onClick={onLogoutClick} className="animate-fadeIn" >
-                Logout
-              </Button>
-              
-              </>)}
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="animate-fadeIn">
-                <Button variant="ghost">Login</Button>
-              </Link>
-              <Link to="/signup" className="animate-fadeIn" >
-                <Button variant="default" className="signup-btn">
-                  Sign Up
-                </Button>
-              </Link>
-            </>
-          )}
-        </div>
+        <div className="login-container-navbar">{renderLinks()}</div>
       </div>
     </nav>
   );

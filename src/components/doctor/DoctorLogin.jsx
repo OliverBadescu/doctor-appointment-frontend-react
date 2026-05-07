@@ -103,7 +103,7 @@ export default function DoctorLogin() {
               
               <button 
                 type="submit" 
-                className={`login-button ${loading ? 'loading' : ''} animate-fadeIn`}
+                className="login-button animate-fadeIn"
                 disabled={loading}
               >
                 {loading ? "Signing In..." : "Sign In"}

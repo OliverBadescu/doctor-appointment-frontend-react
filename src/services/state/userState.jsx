@@ -23,17 +23,6 @@ export function UserProvider({ children }) {
     };
   });
 
-  const checkUser = () =>{
-
-    if(user.id === 0){
-        navigate('/');
-    }
-  }
-
-    useEffect(() => {
-        checkUser();
-    }, []);
-
   useEffect(() => {
     const originalFetch = window.fetch;
     window.fetch = async (input, init = {}) => {
@@ -93,6 +82,14 @@ export function UserProvider({ children }) {
     }
   }
 
+  function updateUserDetails(updates) {
+    setUser((prev) => {
+      const next = { ...prev, ...updates };
+      localStorage.setItem("user", JSON.stringify(next));
+      return next;
+    });
+  }
+
   async function handleRegister(registerRequest) {
     setLoading(true);
     setErrors([]);
@@ -124,7 +121,8 @@ export function UserProvider({ children }) {
         setErrors,
         handleLogin,
         handleLogout,
-        handleRegister
+        handleRegister,
+        updateUserDetails
       }}
     >
       {children}

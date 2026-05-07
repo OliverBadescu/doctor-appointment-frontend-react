@@ -21,7 +21,7 @@ import {
   LocalHospital as LocalHospitalIcon,
   People as PeopleIcon,
 } from '@mui/icons-material';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 
 const drawerWidth = 240;
 
@@ -66,6 +66,7 @@ const MiniDrawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'op
 
 export default function AdminLayout() {
   const theme = useTheme();
+  const location = useLocation();
   const [open, setOpen] = useState(true);
 
   const toggleDrawer = () => {
@@ -100,12 +101,12 @@ export default function AdminLayout() {
               <ListItemButton
                 component={NavLink}
                 to={item.path}
+                selected={location.pathname === item.path}
                 sx={{
                   minHeight: 48,
                   justifyContent: open ? 'initial' : 'center',
                   px: 2.5,
                 }}
-                activeClassName="Mui-selected"
               >
                 <ListItemIcon
                   sx={{

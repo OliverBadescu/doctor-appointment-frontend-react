@@ -8,6 +8,7 @@ import Login from './components/Login.jsx';
 import Signup from './components/Signup.jsx';
 import Dashboard from './components/Dashboard.jsx';
 import NewAppointment from './components/NewAppointment.jsx';
+import Profile from './components/Profile.jsx';
 import { UserProvider } from './services/state/userState.jsx';
 import AdminLayout from './components/admin/AdminLayout.jsx';
 import AdminHomePage from './components/admin/AdminHomePage.jsx';
@@ -23,27 +24,32 @@ function App() {
     <Router>
       <UserProvider>
         <DoctorProvider>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/home" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/appointment" element={<Dashboard />} />
-            <Route path="/appointments/new" element={<NewAppointment />} />
-            <Route path="/login-doctor" element={<DoctorLogin />} />
-            <Route path="/admin/*" element={<AdminLayout />}>  
-              <Route path="home" element={<AdminHomePage />} />
-              <Route path="clinics" element={<ClinicsPageAdmin />} />
-              <Route path="doctors" element={<DoctorsPageAdmin />} />
-              <Route path="patients" element={<PatientsPageAdmin />} />
-              <Route index element={<Navigate to="home" replace />} />
-            </Route>
-            <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+          <div className="app-shell">
+            <Navbar />
+            <main className="app-main">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/appointment" element={<Dashboard />} />
+                <Route path="/appointments/new" element={<NewAppointment />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/login-doctor" element={<DoctorLogin />} />
+                <Route path="/admin/*" element={<AdminLayout />}>
+                  <Route path="home" element={<AdminHomePage />} />
+                  <Route path="clinics" element={<ClinicsPageAdmin />} />
+                  <Route path="doctors" element={<DoctorsPageAdmin />} />
+                  <Route path="patients" element={<PatientsPageAdmin />} />
+                  <Route index element={<Navigate to="home" replace />} />
+                </Route>
+                <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-          <Footer />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </main>
+            <Footer />
+          </div>
         </DoctorProvider>
       </UserProvider>
     </Router>

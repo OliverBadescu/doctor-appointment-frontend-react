@@ -8,14 +8,20 @@ export function DoctorProvider({ children }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState([]);
-  const [doctor, setDoctor] = useState({
-        jwtToken: '',
-        fullName: '',
-        password: '',
-        email: '',
-        specialization: '',
-        phone: '',
-        clinic: ''
+  const [doctor, setDoctor] = useState(() => {
+    const savedDoctor = localStorage.getItem("doctor");
+    if (savedDoctor) {
+      return JSON.parse(savedDoctor);
+    }
+    return {
+      jwtToken: '',
+      fullName: '',
+      password: '',
+      email: '',
+      specialization: '',
+      phone: '',
+      clinic: ''
+    };
   });
 
   const checkDoctor = () => {
@@ -52,8 +58,9 @@ export function DoctorProvider({ children }) {
   }, [doctor.jwtToken]);
 
   function handleLogout() {
+    localStorage.removeItem("doctor");
     setDoctor({
-        jwtToken: '', 
+        jwtToken: '',
         fullName: '',
         password: '',
         email: '',
@@ -75,6 +82,7 @@ export function DoctorProvider({ children }) {
       } else {
         setErrors([]);
         setDoctor(data.body);
+        localStorage.setItem("doctor", JSON.stringify(data.body));
         return { success: true };
       }
     } catch {
