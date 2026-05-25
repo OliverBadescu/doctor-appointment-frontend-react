@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/doctorService";
+import { isJwtExpired } from "../api/api-utils.jsx";
 
 export const DoctorContext = createContext();
 
@@ -35,16 +36,25 @@ export function DoctorProvider({ children }) {
   }, []);
 
   useEffect(() => {
+    if (doctor.jwtToken && isJwtExpired(doctor.jwtToken)) {
+      handleLogout();
+      return;
+    }
+
     const originalFetch = window.fetch;
     window.fetch = async (input, init = {}) => {
       init.headers = init.headers || {};
       if (doctor.jwtToken) {
+        if (isJwtExpired(doctor.jwtToken)) {
+          handleLogout();
+          return new Response(null, { status: 401, statusText: 'Token expired' });
+        }
         init.headers.Authorization = `Bearer ${doctor.jwtToken}`;
       }
 
       try {
         const response = await originalFetch(input, init);
-        if (response.status === 401) {
+        if (response.status === 401 || response.status === 403) {
           handleLogout();
         }
         return response;

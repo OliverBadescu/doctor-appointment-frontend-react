@@ -1,14 +1,29 @@
+export function isJwtExpired(token) {
+    if (!token) return true;
+    try {
+        const payload = token.split('.')[1];
+        if (!payload) return true;
+        const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+        const decoded = JSON.parse(atob(normalized));
+        if (!decoded?.exp) return false;
+        // 5s skew so a token that expires mid-request is treated as expired.
+        return decoded.exp * 1000 <= Date.now() + 5000;
+    } catch {
+        return true;
+    }
+}
+
 function getStoredJwt() {
     try {
         const doctorRaw = localStorage.getItem('doctor');
         if (doctorRaw) {
             const doctor = JSON.parse(doctorRaw);
-            if (doctor?.jwtToken) return doctor.jwtToken;
+            if (doctor?.jwtToken && !isJwtExpired(doctor.jwtToken)) return doctor.jwtToken;
         }
         const userRaw = localStorage.getItem('user');
         if (userRaw) {
             const user = JSON.parse(userRaw);
-            if (user?.jwtToken) return user.jwtToken;
+            if (user?.jwtToken && !isJwtExpired(user.jwtToken)) return user.jwtToken;
         }
     } catch {
         // ignore malformed JSON
