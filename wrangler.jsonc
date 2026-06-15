@@ -1,0 +1,13 @@
+{
+  // Cloudflare Workers Static Assets config for the React/Vite SPA.
+  // Replaces the old _redirects "/* /index.html 200" trick, which the
+  // Workers Assets validator rejects as an infinite loop.
+  "name": "doctor-appointment-frontend-react",
+  "compatibility_date": "2025-05-01",
+  "assets": {
+    "directory": "./dist",
+    // Serve index.html (HTTP 200) for any path that isn't a real file,
+    // so React Router client-side routes and deep links work.
+    "not_found_handling": "single-page-application"
+  }
+}
