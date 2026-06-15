@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import { UserContext } from "../services/state/userState";
@@ -9,6 +9,7 @@ export default function Navbar() {
   const { doctor, handleLogout: handleDoctorLogout } = useContext(DoctorContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // AdminLayout renders its own AppBar + sidebar, so suppress the public
   // navbar on /admin/* to avoid two stacked headers.
@@ -100,7 +101,11 @@ export default function Navbar() {
   return (
     <nav className="navbar-container">
       <div className="navbar-inner-container">
-        <Link to={logoTo} className="logo-container">
+        <Link
+          to={logoTo}
+          className="logo-container"
+          onClick={() => setMenuOpen(false)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -116,7 +121,38 @@ export default function Navbar() {
           <span className="logo-bold animate-fadeIn">EasyApptCare</span>
         </Link>
 
-        <div className="login-container-navbar">{renderLinks()}</div>
+        <button
+          type="button"
+          className="navbar-toggle"
+          aria-label="Toggle navigation menu"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((prev) => !prev)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            width="26"
+            height="26"
+          >
+            {menuOpen ? (
+              <path d="M18 6 6 18M6 6l12 12" />
+            ) : (
+              <path d="M3 12h18M3 6h18M3 18h18" />
+            )}
+          </svg>
+        </button>
+
+        <div
+          className={`login-container-navbar${menuOpen ? " open" : ""}`}
+          onClick={() => setMenuOpen(false)}
+        >
+          {renderLinks()}
+        </div>
       </div>
     </nav>
   );

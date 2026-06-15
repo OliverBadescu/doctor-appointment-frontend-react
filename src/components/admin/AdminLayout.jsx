@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useContext, useState } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import MuiDrawer from '@mui/material/Drawer';
 import {
@@ -13,6 +13,8 @@ import {
   Box,
   IconButton,
   Divider,
+  Button,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -20,8 +22,10 @@ import {
   LocationOn as LocationOnIcon,
   LocalHospital as LocalHospitalIcon,
   People as PeopleIcon,
+  Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { UserContext } from '../../services/state/userState';
 
 const drawerWidth = 240;
 
@@ -40,9 +44,9 @@ const closedMixin = (theme) => ({
     duration: theme.transitions.duration.leavingScreen,
   }),
   overflowX: 'hidden',
-  width: `calc(${theme.spacing(7)} + 1px)`, 
+  width: `calc(${theme.spacing(7)} + 1px)`,
   [theme.breakpoints.up('sm')]: {
-    width: `calc(${theme.spacing(9)} + 1px)`, 
+    width: `calc(${theme.spacing(9)} + 1px)`,
   },
 });
 
@@ -67,11 +71,23 @@ const MiniDrawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'op
 export default function AdminLayout() {
   const theme = useTheme();
   const location = useLocation();
-  const [open, setOpen] = useState(true);
+  const { handleLogout } = useContext(UserContext);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  // On desktop the mini-drawer expands/collapses; on mobile it slides in as an overlay.
+  const [desktopOpen, setDesktopOpen] = useState(true);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const open = isMobile ? mobileOpen : desktopOpen;
 
   const toggleDrawer = () => {
-    setOpen((prev) => !prev);
+    if (isMobile) {
+      setMobileOpen((prev) => !prev);
+    } else {
+      setDesktopOpen((prev) => !prev);
+    }
   };
+
+  const closeMobileDrawer = () => setMobileOpen(false);
 
   const navItems = [
     { label: 'Home', icon: <HomeIcon />, path: '/admin/home' },
@@ -80,6 +96,37 @@ export default function AdminLayout() {
     { label: 'Patients', icon: <PeopleIcon />, path: '/admin/patients' },
   ];
 
+  const navList = (
+    <List>
+      {navItems.map((item) => (
+        <ListItem key={item.label} disablePadding sx={{ display: 'block' }}>
+          <ListItemButton
+            component={NavLink}
+            to={item.path}
+            selected={location.pathname === item.path}
+            onClick={isMobile ? closeMobileDrawer : undefined}
+            sx={{
+              minHeight: 48,
+              justifyContent: open ? 'initial' : 'center',
+              px: 2.5,
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                minWidth: 0,
+                mr: open ? 3 : 'auto',
+                justifyContent: 'center',
+              }}
+            >
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.label} sx={{ opacity: open ? 1 : 0 }} />
+          </ListItemButton>
+        </ListItem>
+      ))}
+    </List>
+  );
+
   return (
     <Box sx={{ display: 'flex' }}>
       <AppBar position="fixed" sx={{ zIndex: theme.zIndex.drawer + 1 }}>
@@ -87,43 +134,51 @@ export default function AdminLayout() {
           <IconButton color="inherit" edge="start" onClick={toggleDrawer} sx={{ mr: 2 }}>
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
             Admin Dashboard
           </Typography>
+          <Button
+            color="inherit"
+            onClick={handleLogout}
+            startIcon={<LogoutIcon />}
+            sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+          >
+            Logout
+          </Button>
+          <IconButton
+            color="inherit"
+            onClick={handleLogout}
+            aria-label="Logout"
+            sx={{ display: { xs: 'inline-flex', sm: 'none' } }}
+          >
+            <LogoutIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
-      <MiniDrawer variant="permanent" open={open} sx={{ mt: 8 }}>
-        <Toolbar />
-        <Divider />
-        <List>
-          {navItems.map((item) => (
-            <ListItem key={item.label} disablePadding sx={{ display: 'block' }}>
-              <ListItemButton
-                component={NavLink}
-                to={item.path}
-                selected={location.pathname === item.path}
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? 'initial' : 'center',
-                  px: 2.5,
-                }}
-              >
-                <ListItemIcon
-                  sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : 'auto',
-                    justifyContent: 'center',
-                  }}
-                >
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.label} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
-        </List>
-      </MiniDrawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, mt: 8 }}>
+
+      {isMobile ? (
+        <MuiDrawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={closeMobileDrawer}
+          ModalProps={{ keepMounted: true }}
+          sx={{
+            '& .MuiDrawer-paper': { width: drawerWidth, boxSizing: 'border-box' },
+          }}
+        >
+          <Toolbar />
+          <Divider />
+          {navList}
+        </MuiDrawer>
+      ) : (
+        <MiniDrawer variant="permanent" open={desktopOpen} sx={{ mt: 8 }}>
+          <Toolbar />
+          <Divider />
+          {navList}
+        </MiniDrawer>
+      )}
+
+      <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 }, mt: 8, minWidth: 0 }}>
         <Outlet />
       </Box>
     </Box>

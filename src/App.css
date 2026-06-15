@@ -2395,4 +2395,88 @@
   color: #b91c1c;
   border: 1px solid #fca5a5;
 }
-      
+
+/* ──────────────────────────────────────────────
+   Responsive / mobile
+   ────────────────────────────────────────────── */
+
+/* Hamburger toggle — hidden on desktop, shown on mobile */
+.navbar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #0c4a6e;
+  padding: 6px;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .navbar-inner-container {
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 14px 16px;
+  }
+
+  .navbar-toggle {
+    display: inline-flex;
+  }
+
+  /* Collapse the links into a stacked dropdown under the logo row */
+  .login-container-navbar {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .login-container-navbar.open {
+    display: flex;
+  }
+
+  .login-container-navbar a {
+    width: 100%;
+  }
+
+  .login-container-navbar button {
+    width: 100%;
+    padding: 12px;
+  }
+}
+
+/* Home / landing page tweaks for small screens */
+@media (max-width: 600px) {
+  .aside-container {
+    height: auto;
+    padding: 40px 16px;
+  }
+
+  .aside-main-container {
+    width: 100%;
+  }
+
+  .h1-tag-aside {
+    font-size: 26px;
+  }
+
+  .features-cards {
+    width: 90%;
+  }
+
+  .signup-now-container {
+    padding: 40px 20px;
+  }
+
+  .sign-up-now-btn {
+    width: auto;
+  }
+
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+  }
+}
