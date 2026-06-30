@@ -45,9 +45,9 @@ export default function DoctorLogin() {
         
         <div className="login-form-container animate-slideUp">
           <div className="welcome-section">
-            <div className="welcome-title animate-fadeIn">Doctor Login</div>
+            <div className="welcome-title animate-fadeIn">Autentificare doctor</div>
             <div className="welcome-subtitle animate-fadeIn">
-              Sign in to your provider account to manage patient appointments
+              Autentifică-te în contul de furnizor pentru a gestiona programările pacienților
             </div>
             {location.state?.message && (
               <div className="success-message animate-fadeIn">
@@ -82,12 +82,12 @@ export default function DoctorLogin() {
               
               <div className="form-group animate-slideUp">
                 <div className="password-header">
-                  <label htmlFor="password" className="form-label">Password</label>
+                  <label htmlFor="password" className="form-label">Parolă</label>
                   <Link 
                     to="/doctor/forgot-password"
                     className="forgot-password"
                   >
-                    Forgot password?
+                    Ai uitat parola?
                   </Link>
                 </div>
                 <input
@@ -106,7 +106,7 @@ export default function DoctorLogin() {
                 className="login-button animate-fadeIn"
                 disabled={loading}
               >
-                {loading ? "Signing In..." : "Sign In"}
+                {loading ? "Se autentifică..." : "Autentifică-te"}
               </button>
             </form>
           </div>
@@ -114,9 +114,9 @@ export default function DoctorLogin() {
           <div className="signup-prompt animate-fadeIn">
             
             <p className="signup-text">
-              Are you a patient?{" "}
+              Ești pacient?{" "}
               <Link to="/login" className="signup-link">
-                Login here
+                Autentifică-te aici
               </Link>
             </p>
           </div>

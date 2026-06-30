@@ -77,7 +77,7 @@ export function UserProvider({ children }) {
     try {
       const data = await login(loginRequest);
       if (!data.success) {
-        setErrors(["Invalid credentials, please try again"]);
+        setErrors(["Date de autentificare invalide, te rugăm să încerci din nou"]);
         return false;
       } else {
         setErrors([]);
@@ -86,7 +86,7 @@ export function UserProvider({ children }) {
         return { success: true, role: data.body.userRole };
       }
     } catch {
-      setErrors(["An error occurred during login"]);
+      setErrors(["A apărut o eroare la autentificare"]);
       return false;
     } finally {
       setLoading(false);
@@ -109,13 +109,13 @@ export function UserProvider({ children }) {
 
       console.log(data);
       if (data.status === 409) {
-        setErrors(["User with this email already exists, please try a different one"]);
+        setErrors(["Există deja un utilizator cu acest email, te rugăm să folosești altul"]);
       } else {
         setErrors([]);
         return true;
       }
     } catch {
-      setErrors(["An error occurred during registration"]);
+      setErrors(["A apărut o eroare la înregistrare"]);
     } finally {
       setLoading(false);
     }

@@ -11,7 +11,7 @@ const CancelConfirmationModal = ({ isOpen, onClose, onConfirm, appointmentDetail
     <div className="modal-overlay animate-fadeIn" onClick={onClose}>
       <div className="modal-content animate-slideUp" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3 className="modal-title">Cancel Appointment</h3>
+          <h3 className="modal-title">Anulează programarea</h3>
           <button className="modal-close" onClick={onClose}>
             ×
           </button>
@@ -22,36 +22,36 @@ const CancelConfirmationModal = ({ isOpen, onClose, onConfirm, appointmentDetail
             ⚠️
           </div>
           <p className="modal-message">
-            Are you sure you want to cancel your appointment?
+            Sigur dorești să anulezi programarea?
           </p>
           {appointmentDetails && (
             <div className="appointment-summary">
               <div className="summary-item">
-                <strong>Doctor:</strong> {appointmentDetails.doctor?.fullName || "Unknown Doctor"}
+                <strong>Doctor:</strong> {appointmentDetails.doctor?.fullName || "Doctor necunoscut"}
               </div>
               <div className="summary-item">
-                <strong>Date:</strong> {new Date(appointmentDetails.start.replace(" ", "T")).toLocaleDateString('en-US', {
+                <strong>Dată:</strong> {new Date(appointmentDetails.start.replace(" ", "T")).toLocaleDateString('ro-RO', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric'
                 })}
               </div>
               <div className="summary-item">
-                <strong>Time:</strong> {new Date(appointmentDetails.start.replace(" ", "T")).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                <strong>Oră:</strong> {new Date(appointmentDetails.start.replace(" ", "T")).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
               </div>
             </div>
           )}
           <p className="modal-warning">
-            This action cannot be undone.
+            Această acțiune nu poate fi anulată.
           </p>
         </div>
         
         <div className="modal-footer">
           <button className="modal-button cancel-btn" onClick={onClose}>
-            Keep Appointment
+            Păstrează programarea
           </button>
           <button className="modal-button confirm-btn" onClick={onConfirm}>
-            Yes, Cancel Appointment
+            Da, anulează programarea
           </button>
         </div>
       </div>
@@ -67,11 +67,11 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
 
   const handleSubmitReview = () => {
     if (rating === 0) {
-      alert('Please select a rating');
+      alert('Te rugăm să selectezi o evaluare');
       return;
     }
     if (title.trim() === '') {
-      alert('Please enter a title for your review');
+      alert('Te rugăm să introduci un titlu pentru recenzie');
       return;
     }
     const reviewData = {
@@ -105,7 +105,7 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
     <div className="modal-overlay animate-fadeIn" onClick={handleClose}>
       <div className="modal-content review-modal animate-slideUp" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3 className="modal-title">Leave a Review</h3>
+          <h3 className="modal-title">Lasă o recenzie</h3>
           <button className="modal-close" onClick={handleClose}>
             ×
           </button>
@@ -115,10 +115,10 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
           {appointmentDetails && (
             <div className="doctor-info">
               <h4 className="doctor-review-name">
-                {appointmentDetails.doctor?.fullName || "Unknown Doctor"}
+                {appointmentDetails.doctor?.fullName || "Doctor necunoscut"}
               </h4>
               <p className="appointment-date">
-                Appointment on {new Date(appointmentDetails.start.replace(" ", "T")).toLocaleDateString('en-US', {
+                Programare pe {new Date(appointmentDetails.start.replace(" ", "T")).toLocaleDateString('ro-RO', {
                   month: 'long',
                   day: 'numeric',
                   year: 'numeric'
@@ -129,7 +129,7 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
 
           <div className="review-form">
             <div className="form-group">
-              <label className="form-label">Rating *</label>
+              <label className="form-label">Evaluare *</label>
               <div className="star-rating">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
@@ -147,23 +147,23 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
               <p className="rating-text">
                 {rating > 0 && (
                   <span>
-                    {rating === 1 && "Poor"}
-                    {rating === 2 && "Fair"}
-                    {rating === 3 && "Good"}
-                    {rating === 4 && "Very Good"}
-                    {rating === 5 && "Excellent"}
+                    {rating === 1 && "Slab"}
+                    {rating === 2 && "Acceptabil"}
+                    {rating === 3 && "Bun"}
+                    {rating === 4 && "Foarte bun"}
+                    {rating === 5 && "Excelent"}
                   </span>
                 )}
               </p>
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="review-title">Review Title *</label>
+              <label className="form-label" htmlFor="review-title">Titlul recenziei *</label>
               <input
                 id="review-title"
                 type="text"
                 className="form-input"
-                placeholder="Summarize your experience..."
+                placeholder="Rezumă experiența ta..."
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 maxLength={100}
@@ -172,11 +172,11 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
             </div>
 
             <div className="form-group">
-              <label className="form-label" htmlFor="review-description">Description (Optional)</label>
+              <label className="form-label" htmlFor="review-description">Descriere (Opțional)</label>
               <textarea
                 id="review-description"
                 className="form-textarea"
-                placeholder="Tell us more about your experience with this doctor..."
+                placeholder="Spune-ne mai multe despre experiența ta cu acest doctor..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={4}
@@ -189,14 +189,14 @@ const ReviewModal = ({ isOpen, onClose, onSubmit, appointmentDetails }) => {
         
         <div className="modal-footer">
           <button className="modal-button cancel-btn" onClick={handleClose}>
-            Cancel
+            Anulează
           </button>
-          <button 
-            className="modal-button confirm-btn" 
+          <button
+            className="modal-button confirm-btn"
             onClick={handleSubmitReview}
             disabled={rating === 0 || title.trim() === ''}
           >
-            Submit Review
+            Trimite recenzia
           </button>
         </div>
       </div>
@@ -210,11 +210,11 @@ const ReviewSuccessModal = ({ isOpen, onClose, doctorName, rating }) => {
 
   const getRatingText = (rating) => {
     switch (rating) {
-      case 1: return "Poor";
-      case 2: return "Fair";
-      case 3: return "Good";
-      case 4: return "Very Good";
-      case 5: return "Excellent";
+      case 1: return "Slab";
+      case 2: return "Acceptabil";
+      case 3: return "Bun";
+      case 4: return "Foarte bun";
+      case 5: return "Excelent";
       default: return "";
     }
   };
@@ -223,7 +223,7 @@ const ReviewSuccessModal = ({ isOpen, onClose, doctorName, rating }) => {
     <div className="modal-overlay animate-fadeIn" onClick={onClose}>
       <div className="modal-content success-modal animate-slideUp" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h3 className="modal-title">Review Submitted Successfully!</h3>
+          <h3 className="modal-title">Recenzie trimisă cu succes!</h3>
           <button className="modal-close" onClick={onClose}>
             ×
           </button>
@@ -234,13 +234,13 @@ const ReviewSuccessModal = ({ isOpen, onClose, doctorName, rating }) => {
             ✅
           </div>
           <div className="success-content">
-            <h4 className="success-title">Thank you for your feedback!</h4>
+            <h4 className="success-title">Îți mulțumim pentru feedback!</h4>
             <p className="success-message">
-              Your review for <strong>{doctorName}</strong> has been submitted successfully.
+              Recenzia ta pentru <strong>{doctorName}</strong> a fost trimisă cu succes.
             </p>
             <div className="review-summary">
               <div className="submitted-rating">
-                <span className="rating-label">Your Rating:</span>
+                <span className="rating-label">Evaluarea ta:</span>
                 <div className="rating-display">
                   <div className="stars">
                     {[1, 2, 3, 4, 5].map((star) => (
@@ -257,14 +257,14 @@ const ReviewSuccessModal = ({ isOpen, onClose, doctorName, rating }) => {
               </div>
             </div>
             <p className="success-note">
-              Your review will help other patients make informed decisions about their healthcare.
+              Recenzia ta îi va ajuta pe alți pacienți să ia decizii informate despre sănătatea lor.
             </p>
           </div>
         </div>
         
         <div className="modal-footer">
           <button className="modal-button confirm-btn success-btn" onClick={onClose}>
-            Great!
+            Excelent!
           </button>
         </div>
       </div>
@@ -325,11 +325,11 @@ export default function Dashboard() {
         if (response.success) {
           setAppointments(response.body.appointments || []);
         } else {
-          setError("Failed to load appointments");
+          setError("Încărcarea programărilor a eșuat");
           console.error("Error fetching appointments:", response.message);
         }
       } catch (err) {
-        setError("An error occurred while fetching appointments");
+        setError("A apărut o eroare la încărcarea programărilor");
         console.error(err);
       } finally {
         setLoading(false);
@@ -364,13 +364,13 @@ export default function Dashboard() {
       const response = await deleteAppointment(selectedAppointment.id);
       if (response.success) {
         setAppointments(appointments.filter(appointment => appointment.id !== selectedAppointment.id));
-        showToast("Appointment cancelled successfully", "success");
+        showToast("Programare anulată cu succes", "success");
       } else {
-        showToast("Failed to cancel appointment. Please try again.", "error");
+        showToast("Anularea programării a eșuat. Te rugăm să încerci din nou.", "error");
       }
     } catch (error) {
       console.error("Error canceling appointment:", error);
-      showToast("An error occurred. Please try again.", "error");
+      showToast("A apărut o eroare. Te rugăm să încerci din nou.", "error");
     } finally {
       closeCancelModal();
     }
@@ -398,7 +398,7 @@ export default function Dashboard() {
       if (response.success) {
         // Store review data for success modal
         setSubmittedReview({
-          doctorName: selectedAppointment?.doctor?.fullName || "Unknown Doctor",
+          doctorName: selectedAppointment?.doctor?.fullName || "Doctor necunoscut",
           rating: reviewData.rating
         });
         
@@ -408,24 +408,24 @@ export default function Dashboard() {
         // Show success modal
         setSuccessModalOpen(true);
       } else {
-        showToast(response.message || "Failed to submit review. Please try again.", "error");
+        showToast(response.message || "Trimiterea recenziei a eșuat. Te rugăm să încerci din nou.", "error");
       }
     } catch (error) {
       console.error("Error submitting review:", error);
-      showToast("An error occurred while submitting your review. Please try again.", "error");
+      showToast("A apărut o eroare la trimiterea recenziei. Te rugăm să încerci din nou.", "error");
     }
   };
 
   const getStatusDisplay = (status) => {
     switch (status?.toUpperCase()) {
       case 'COMPLETED':
-        return { text: 'Completed', className: 'status-completed' };
+        return { text: 'Finalizată', className: 'status-completed' };
       case 'CANCELLED':
-        return { text: 'Cancelled', className: 'status-cancelled' };
+        return { text: 'Anulată', className: 'status-cancelled' };
       case 'SCHEDULED':
-        return { text: 'Upcoming', className: 'status-upcoming' };
+        return { text: 'Viitoare', className: 'status-upcoming' };
       default:
-        return { text: 'Upcoming', className: 'status-upcoming' };
+        return { text: 'Viitoare', className: 'status-upcoming' };
     }
   };
 
@@ -441,7 +441,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="loading animate-fadeIn">
-        Loading your appointments...
+        Se încarcă programările tale...
       </div>
     );
   }
@@ -460,15 +460,15 @@ export default function Dashboard() {
         <div className="header-section animate-slideUp">
           <div className="user-welcome">
             <h1 className="welcome-title animate-fadeIn">
-              Welcome, {user.fullName}
+              Bun venit, {user.fullName}
             </h1>
             <p className="welcome-subtitle animate-fadeIn delay-50">
-              Manage your appointments and health records
+              Gestionează-ți programările și fișele medicale
             </p>
           </div>
           <Link to="/appointments/new">
             <button className="book-button animate-fadeIn">
-              Book New Appointment
+              Programare nouă
             </button>
           </Link>
         </div>
@@ -485,15 +485,15 @@ export default function Dashboard() {
             </div>
             <div className="stat-info">
               <span className="stat-number">{appointments.length}</span>
-              <span className="stat-label">Total Appointments</span>
-              <span className="stat-sublabel">Your scheduled appointments</span>
+              <span className="stat-label">Total programări</span>
+              <span className="stat-sublabel">Programările tale</span>
             </div>
           </div>
         </div>
         
         <div className="appointments-section animate-fadeIn">
           <div className="section-header">
-            <h2 className="section-title">Your Appointments</h2>
+            <h2 className="section-title">Programările tale</h2>
           </div>
           
           {appointments.length > 0 ? (
@@ -514,13 +514,13 @@ export default function Dashboard() {
                       {/* Visual date block */}
                       <div className="date-block">
                         <span className="date-block-weekday">
-                          {startDate.toLocaleDateString('en-US', { weekday: 'short' })}
+                          {startDate.toLocaleDateString('ro-RO', { weekday: 'short' })}
                         </span>
                         <span className="date-block-day">
                           {startDate.getDate()}
                         </span>
                         <span className="date-block-month">
-                          {startDate.toLocaleDateString('en-US', { month: 'short' })}
+                          {startDate.toLocaleDateString('ro-RO', { month: 'short' })}
                         </span>
                         <span className="date-block-time">
                           {startDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
@@ -531,10 +531,10 @@ export default function Dashboard() {
                         <div className="appointment-header">
                           <div>
                             <h3 className="doctor-name">
-                              {appointment.doctor?.fullName || "Unknown Doctor"}
+                              {appointment.doctor?.fullName || "Doctor necunoscut"}
                             </h3>
                             <p className="clinic-name">
-                              Medical Center
+                              Centru medical
                             </p>
                           </div>
                           <div className="appointment-status">
@@ -544,11 +544,11 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <p className="appointment-reason">
-                          {appointment.reason || "No reason provided"}
+                          {appointment.reason || "Niciun motiv specificat"}
                         </p>
                         <div className="appointment-time-info">
                           <div className="time-detail">
-                            <p className="detail-label">Duration</p>
+                            <p className="detail-label">Durată</p>
                             <p className="detail-value">
                               {startDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - {endDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
                             </p>
@@ -563,14 +563,14 @@ export default function Dashboard() {
                             className="action-button review-button"
                             onClick={() => handleLeaveReview(appointment)}
                           >
-                            Leave a Review
+                            Lasă o recenzie
                           </button>
                         ) : canCancel ? (
                           <button
                             className="action-button cancel-button"
                             onClick={() => openCancelModal(appointment)}
                           >
-                            Cancel Appointment
+                            Anulează programarea
                           </button>
                         ) : null}
                       </div>
@@ -584,14 +584,14 @@ export default function Dashboard() {
               <div className="empty-icon animate-fadeIn">
               </div>
               <h3 className="empty-title animate-fadeIn delay-50">
-                No Appointments
+                Nicio programare
               </h3>
               <p className="empty-message animate-fadeIn delay-100">
-                You don't have any appointments.
+                Nu ai nicio programare.
               </p>
               <Link to="/appointments/new">
                 <button className="book-button animate-slideUp delay-150">
-                  Book Your First Appointment
+                  Fă prima ta programare
                 </button>
               </Link>
             </div>

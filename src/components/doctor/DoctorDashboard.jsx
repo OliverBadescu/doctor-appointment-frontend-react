@@ -50,11 +50,11 @@ export default function DoctorDashboard() {
                     setAppointments(normalized);
                     calculateStats(normalized);
                   } else {
-                    setError("Failed to load appointments");
+                    setError("Încărcarea programărilor a eșuat");
                     console.error("Error fetching appointments:", response.message);
                 }
             } catch (err) {
-                setError("An error occurred while fetching appointments");
+                setError("A apărut o eroare la încărcarea programărilor");
                 console.error(err);
             } finally {
                 setLoading(false);
@@ -135,11 +135,11 @@ export default function DoctorDashboard() {
                 }));
                 setPatientAppointments(normalized);
             } else {
-                setPatientHistoryError("Failed to load patient history");
+                setPatientHistoryError("Încărcarea istoricului pacientului a eșuat");
                 console.error("Error fetching patient history:", response.message);
             }
         } catch (err) {
-            setPatientHistoryError("An error occurred while fetching patient history");
+            setPatientHistoryError("A apărut o eroare la încărcarea istoricului pacientului");
             console.error(err);
         } finally {
             setLoadingPatientHistory(false);
@@ -175,20 +175,20 @@ export default function DoctorDashboard() {
                 calculateStats(updatedAppointments);
                 
                 setUpdateMessage({
-                    text: `Appointment status updated to ${newStatus}`,
+                    text: `Statusul programării a fost actualizat la ${newStatus}`,
                     type: 'success'
                 });
                 
             } else {
                 setUpdateMessage({
-                    text: `Failed to update status: ${response.message}`,
+                    text: `Actualizarea statusului a eșuat: ${response.message}`,
                     type: 'error'
                 });
                 console.error("Error updating appointment status:", response.message);
             }
         } catch (err) {
             setUpdateMessage({
-                text: "An error occurred while updating the status",
+                text: "A apărut o eroare la actualizarea statusului",
                 type: 'error'
             });
             console.error("Exception during status update:", err);
@@ -200,7 +200,7 @@ export default function DoctorDashboard() {
     if (loading) {
         return (
             <div className="loading animate-fadeIn">
-                Loading your appointments...
+                Se încarcă programările tale...
             </div>
         );
     }
@@ -220,10 +220,10 @@ export default function DoctorDashboard() {
             <div className="header-section animate-slideUp">
                 <div className="user-welcome">
                     <h1 className="welcome-title animate-fadeIn">
-                        Welcome, Dr. {doctor.fullName}
+                        Bun venit, Dr. {doctor.fullName}
                     </h1>
                     <p className="welcome-subtitle animate-fadeIn delay-50">
-                        Manage your patient appointments and schedule
+                        Gestionează programările și orarul pacienților
                     </p>
                 </div>
             </div>
@@ -237,7 +237,7 @@ export default function DoctorDashboard() {
             <div className="dashboard-stats animate-fadeIn delay-150">
                 <div className="stat-card animate-slideUp">
                     <div className="stat-header">
-                        <div className="stat-title">Today&#39;s Appointments</div>
+                        <div className="stat-title">Programările de astăzi</div>
                     </div>
                     <div className="stat-content">
                         <div className="stat-value">{stats.today}</div>
@@ -246,7 +246,7 @@ export default function DoctorDashboard() {
 
                 <div className="stat-card animate-slideUp delay-50">
                     <div className="stat-header">
-                        <div className="stat-title">This Week</div>
+                        <div className="stat-title">Săptămâna aceasta</div>
                     </div>
                     <div className="stat-content">
                         <div className="stat-value">{stats.thisWeek}</div>
@@ -255,7 +255,7 @@ export default function DoctorDashboard() {
 
                 <div className="stat-card animate-slideUp delay-100">
                     <div className="stat-header">
-                        <div className="stat-title">Upcoming Total</div>
+                        <div className="stat-title">Total viitoare</div>
                     </div>
                     <div className="stat-content">
                         <div className="stat-value">{stats.upcoming}</div>
@@ -264,7 +264,7 @@ export default function DoctorDashboard() {
 
                 <div className="stat-card animate-slideUp delay-150">
                     <div className="stat-header">
-                        <div className="stat-title">Completed</div>
+                        <div className="stat-title">Finalizată</div>
                     </div>
                     <div className="stat-content">
                         <div className="stat-value">{stats.completed}</div>
@@ -274,31 +274,31 @@ export default function DoctorDashboard() {
 
             <div className="appointments-section animate-fadeIn delay-200">
                 <div className="section-header">
-                    <h2 className="section-title">Appointments</h2>
+                    <h2 className="section-title">Programări</h2>
                     <div className="filter-controls">
                         <button
                             className={`filter-button ${filter === 'all' ? 'active' : ''}`}
                             onClick={() => setFilter('all')}
                         >
-                            All
+                            Toate
                         </button>
                         <button
                             className={`filter-button ${filter === 'upcoming' ? 'active' : ''}`}
                             onClick={() => setFilter('upcoming')}
                         >
-                            Upcoming
+                            Viitoare
                         </button>
                         <button
                             className={`filter-button ${filter === 'completed' ? 'active' : ''}`}
                             onClick={() => setFilter('completed')}
                         >
-                            Completed
+                            Finalizată
                         </button>
                         <button
                             className={`filter-button ${filter === 'cancelled' ? 'active' : ''}`}
                             onClick={() => setFilter('cancelled')}
                         >
-                            Cancelled
+                            Anulată
                         </button>
                     </div>
                 </div>
@@ -323,7 +323,7 @@ export default function DoctorDashboard() {
                                             <div className="appointment-header">
                                                 <div>
                                                     <h3 className="patient-name">
-                                                        {appointment.user?.fullName || "Unknown Patient"}
+                                                        {appointment.user?.fullName || "Pacient necunoscut"}
                                                     </h3>
                                                     <p className="appointment-id">
                                                         ID: {appointment.id}
@@ -331,22 +331,22 @@ export default function DoctorDashboard() {
                                                 </div>
                                                 <div className="appointment-status">
                                                     <span className={`status-badge ${appointment.status}`}>
-                                                        {appointment.status === 'upcoming' ? 'Upcoming' :
-                                                            appointment.status === 'completed' ? 'Completed' :
-                                                            appointment.status === 'cancelled' ? 'Cancelled' :
-                                                            appointment.status || 'Scheduled'}
+                                                        {appointment.status === 'upcoming' ? 'Viitoare' :
+                                                            appointment.status === 'completed' ? 'Finalizată' :
+                                                            appointment.status === 'cancelled' ? 'Anulată' :
+                                                            appointment.status || 'Programată'}
                                                     </span>
-                                                    {isToday && <span className="today-badge">Today</span>}
+                                                    {isToday && <span className="today-badge">Astăzi</span>}
                                                 </div>
                                             </div>
                                             <p className="appointment-reason">
-                                                {appointment.reason || "No reason provided"}
+                                                {appointment.reason || "Niciun motiv specificat"}
                                             </p>
                                             <div className="appointment-time-info">
                                                 <div className="time-detail">
-                                                    <p className="detail-label">Date</p>
+                                                    <p className="detail-label">Dată</p>
                                                     <p className="detail-value">
-                                                        {startDate.toLocaleDateString('en-US', {
+                                                        {startDate.toLocaleDateString('ro-RO', {
                                                             month: 'short',
                                                             day: 'numeric',
                                                             year: 'numeric'
@@ -354,13 +354,13 @@ export default function DoctorDashboard() {
                                                     </p>
                                                 </div>
                                                 <div className="time-detail">
-                                                    <p className="detail-label">Time</p>
+                                                    <p className="detail-label">Oră</p>
                                                     <p className="detail-value">
                                                         {startDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})} - {endDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
                                                     </p>
                                                 </div>
                                                 <div className="time-detail">
-                                                    <p className="detail-label">Patient ID</p>
+                                                    <p className="detail-label">ID pacient</p>
                                                     <p className="detail-value">
                                                         {appointment.user?.id || "N/A"}
                                                     </p>
@@ -376,14 +376,14 @@ export default function DoctorDashboard() {
                                                         onClick={() => handleUpdateStatus(appointment.id, 'completed')}
                                                         disabled={statusUpdating}
                                                     >
-                                                        {statusUpdating ? 'Updating...' : 'Mark Completed'}
+                                                        {statusUpdating ? 'Se actualizează...' : 'Marchează finalizată'}
                                                     </button>
                                                     <button
                                                         className="action-button cancel-button animate-fadeIn"
                                                         onClick={() => handleUpdateStatus(appointment.id, 'cancelled')}
                                                         disabled={statusUpdating}
                                                     >
-                                                        {statusUpdating ? 'Updating...' : 'Cancel'}
+                                                        {statusUpdating ? 'Se actualizează...' : 'Anulează'}
                                                     </button>
                                                 </>
                                             )}
@@ -391,10 +391,10 @@ export default function DoctorDashboard() {
                                                 className="action-button view-patient-button animate-fadeIn "
                                                 onClick={() => handleOpenPatientModal(
                                                     appointment.user?.id || 0, 
-                                                    appointment.user?.fullName || "Unknown Patient"
+                                                    appointment.user?.fullName || "Pacient necunoscut"
                                                 )}
                                             >
-                                                Patient Details
+                                                Detalii pacient
                                             </button>
                                         </div>
                                     </div>
@@ -408,18 +408,18 @@ export default function DoctorDashboard() {
                         
                         </div>
                         <h3 className="empty-title animate-fadeIn delay-50">
-                            No Appointments
+                            Nicio programare
                         </h3>
                         <p className="empty-message animate-fadeIn delay-100">
                             {filter === 'all'
-                                ? "You don't have any appointments scheduled."
-                                : `You don't have any ${filter} appointments.`}
+                                ? "Nu ai nicio programare planificată."
+                                : `Nu ai nicio programare ${({ upcoming: 'viitoare', completed: 'finalizată', cancelled: 'anulată' }[filter] || filter)}.`}
                         </p>
                         <button
                             className="return-button animate-slideUp delay-150"
                             onClick={() => setFilter('all')}
                         >
-                            View All Appointments
+                            Vezi toate programările
                         </button>
                     </div>
                 )}
@@ -430,26 +430,26 @@ export default function DoctorDashboard() {
                 <div className="modal-overlay">
                     <div className="modal-container">
                         <div className="modal-header">
-                            <h2>Patient Appointment History - {selectedPatient?.name}</h2>
+                            <h2>Istoric programări pacient - {selectedPatient?.name}</h2>
                             <button className="close-button" onClick={handleCloseModal}>×</button>
                         </div>
                         
                         <div className="modal-content">
                             {loadingPatientHistory ? (
-                                <div className="loading-spinner">Loading patient history...</div>
+                                <div className="loading-spinner">Se încarcă istoricul pacientului...</div>
                             ) : patientHistoryError ? (
                                 <div className="error-message">{patientHistoryError}</div>
                             ) : patientAppointments.length === 0 ? (
-                                <div className="empty-state">No previous appointments found for this patient.</div>
+                                <div className="empty-state">Nu s-au găsit programări anterioare pentru acest pacient.</div>
                             ) : (
                                 <div className="patient-appointments-list">
-                                    <h3>Previous Appointments</h3>
+                                    <h3>Programări anterioare</h3>
                                     <table className="appointments-table">
                                         <thead>
                                             <tr>
-                                                <th>Date</th>
-                                                <th>Time</th>
-                                                <th>Reason</th>
+                                                <th>Dată</th>
+                                                <th>Oră</th>
+                                                <th>Motiv</th>
                                                 <th>Status</th>
                                                 <th>Doctor</th>
                     
@@ -460,19 +460,19 @@ export default function DoctorDashboard() {
                                                 const appointmentDate = new Date(appointment.start.replace(" ", "T"));
                                                 return (
                                                     <tr key={appointment.id} className={`appointment-row ${appointment.status}`}>
-                                                        <td>{appointmentDate.toLocaleDateString('en-US', {
+                                                        <td>{appointmentDate.toLocaleDateString('ro-RO', {
                                                             month: 'short',
                                                             day: 'numeric',
                                                             year: 'numeric'
                                                         })}</td>
                                                         <td>{appointmentDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}</td>
-                                                        <td>{appointment.reason || "Not specified"}</td>
+                                                        <td>{appointment.reason || "Nespecificat"}</td>
                                                         <td>
                                                             <span className={`status-indicator ${appointment.status}`}>
-                                                                {appointment.status === 'upcoming' ? 'Upcoming' :
-                                                                 appointment.status === 'completed' ? 'Completed' :
-                                                                 appointment.status === 'cancelled' ? 'Cancelled' : 
-                                                                 appointment.status || 'Unknown'}
+                                                                {appointment.status === 'upcoming' ? 'Viitoare' :
+                                                                 appointment.status === 'completed' ? 'Finalizată' :
+                                                                 appointment.status === 'cancelled' ? 'Anulată' :
+                                                                 appointment.status || 'Necunoscut'}
                                                             </span>
                                                         </td>
                                                         <td>{appointment.doctor?.fullName || "N/A"}</td>
@@ -486,7 +486,7 @@ export default function DoctorDashboard() {
                         </div>
                         
                         <div className="modal-footer">
-                            <button className="modal-button secondary" onClick={handleCloseModal}>Close</button>
+                            <button className="modal-button secondary" onClick={handleCloseModal}>Închide</button>
                         </div>
                     </div>
                 </div>

@@ -36,7 +36,7 @@ export default function Profile() {
         setForm(next);
         setInitial(next);
       } else {
-        setLoadError(response.message || "Failed to load profile");
+        setLoadError(response.message || "Încărcarea profilului a eșuat");
       }
       setLoading(false);
     })();
@@ -78,10 +78,10 @@ export default function Profile() {
         fullName: form.fullName.trim(),
         email: form.email.trim(),
       });
-      setFeedback({ text: "Profile updated", type: "success" });
+      setFeedback({ text: "Profil actualizat", type: "success" });
     } else {
       setFeedback({
-        text: response.message || "Failed to update profile",
+        text: response.message || "Actualizarea profilului a eșuat",
         type: "error",
       });
     }
@@ -92,7 +92,7 @@ export default function Profile() {
   };
 
   if (loading) {
-    return <div className="loading animate-fadeIn">Loading your profile...</div>;
+    return <div className="loading animate-fadeIn">Se încarcă profilul tău...</div>;
   }
 
   if (loadError) {
@@ -103,9 +103,9 @@ export default function Profile() {
     <div className="profile-container animate-fadeIn">
       <div className="profile-card animate-slideUp">
         <div className="profile-header">
-          <h1 className="profile-title">Your Profile</h1>
+          <h1 className="profile-title">Profilul tău</h1>
           <p className="profile-subtitle">
-            View and update your personal information
+            Vizualizează și actualizează informațiile personale
           </p>
         </div>
 
@@ -117,13 +117,13 @@ export default function Profile() {
 
         <form onSubmit={handleSubmit} className="profile-form">
           <div className="form-group animate-slideUp">
-            <label htmlFor="fullName" className="form-label">Full Name</label>
+            <label htmlFor="fullName" className="form-label">Nume complet</label>
             <input
               id="fullName"
               className="form-input"
               value={form.fullName}
               onChange={handleChange}
-              placeholder="John Doe"
+              placeholder="Ion Popescu"
               required
             />
           </div>
@@ -148,14 +148,14 @@ export default function Profile() {
               onClick={handleReset}
               disabled={!isDirty || saving}
             >
-              Cancel
+              Anulează
             </button>
             <button
               type="submit"
               className="profile-button primary"
               disabled={!isDirty || saving}
             >
-              {saving ? "Saving..." : "Save Changes"}
+              {saving ? "Se salvează..." : "Salvează modificările"}
             </button>
           </div>
         </form>

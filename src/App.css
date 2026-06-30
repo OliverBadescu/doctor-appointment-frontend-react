@@ -165,8 +165,10 @@
 }
 
 .sign-up-now-btn{
-  width: 10%;
-  padding: 20px;
+  width: auto;
+  height: auto;
+  padding: 16px 36px;
+  white-space: nowrap;
   color: #50a5d5;
   font-weight: bold;
   font-size: 15px;
@@ -1906,7 +1908,7 @@
   }
 
   .sign-up-now-btn{
-    width: 20%;
+    width: auto;
   }
 }
 
@@ -1940,7 +1942,7 @@
 
 
   .sign-up-now-btn{
-    width: 30%;
+    width: auto;
   }
 
   .signup-now-container{
@@ -1975,7 +1977,7 @@
   }
 
    .sign-up-now-btn{
-    width: 50%;
+    width: auto;
   }
 }
 

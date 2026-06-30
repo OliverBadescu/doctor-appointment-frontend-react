@@ -37,16 +37,16 @@ export default function Navbar() {
       return (
         <>
           <Link to="/admin/clinics" className="animate-fadeIn">
-            <Button variant="ghost">Clinics</Button>
+            <Button variant="ghost">Clinici</Button>
           </Link>
           <Link to="/admin/doctors" className="animate-fadeIn">
-            <Button variant="ghost">Doctors</Button>
+            <Button variant="ghost">Doctori</Button>
           </Link>
           <Link to="/admin/patients" className="animate-fadeIn">
-            <Button variant="ghost">Patients</Button>
+            <Button variant="ghost">Pacienți</Button>
           </Link>
           <Button onClick={onUserLogoutClick} className="animate-fadeIn">
-            Logout
+            Deconectare
           </Button>
         </>
       );
@@ -56,10 +56,10 @@ export default function Navbar() {
       return (
         <>
           <Link to="/doctor/dashboard" className="animate-fadeIn">
-            <Button variant="ghost">Dashboard</Button>
+            <Button variant="ghost">Panou de control</Button>
           </Link>
           <Button onClick={handleDoctorLogout} className="animate-fadeIn">
-            Logout
+            Deconectare
           </Button>
         </>
       );
@@ -69,16 +69,16 @@ export default function Navbar() {
       return (
         <>
           <Link to="/appointment" className="animate-fadeIn">
-            <Button variant="ghost">Appointments</Button>
+            <Button variant="ghost">Programări</Button>
           </Link>
           <Link to="/appointments/new" className="animate-fadeIn">
-            <Button variant="ghost">New Appointment</Button>
+            <Button variant="ghost">Programare nouă</Button>
           </Link>
           <Link to="/profile" className="animate-fadeIn">
-            <Button variant="ghost">Profile</Button>
+            <Button variant="ghost">Profil</Button>
           </Link>
           <Button onClick={onUserLogoutClick} className="animate-fadeIn">
-            Logout
+            Deconectare
           </Button>
         </>
       );
@@ -87,11 +87,11 @@ export default function Navbar() {
     return (
       <>
         <Link to="/login" className="animate-fadeIn">
-          <Button variant="ghost">Login</Button>
+          <Button variant="ghost">Autentificare</Button>
         </Link>
         <Link to="/signup" className="animate-fadeIn">
           <Button variant="default" className="signup-btn">
-            Sign Up
+            Înregistrare
           </Button>
         </Link>
       </>
@@ -124,7 +124,7 @@ export default function Navbar() {
         <button
           type="button"
           className="navbar-toggle"
-          aria-label="Toggle navigation menu"
+          aria-label="Comută meniul de navigare"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((prev) => !prev)}
         >

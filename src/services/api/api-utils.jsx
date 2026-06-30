@@ -62,7 +62,7 @@ export async function request(path = '', method = 'GET', body = null) {
         if (res.ok) return { success: true, status: res.status, body: data };
 
         const msg =
-            (data && data.message) || res.statusText || 'Request failed';
+            (data && data.message) || res.statusText || 'Cererea a eșuat';
         const err = new Error(msg);
         err.status = res.status;
         throw err;
@@ -70,7 +70,7 @@ export async function request(path = '', method = 'GET', body = null) {
         return {
             success : false,
             status  : err.status ?? 500,
-            message : err.message || 'Something went wrong',
+            message : err.message || 'A apărut o eroare',
         };
     }
 }

@@ -50,9 +50,9 @@ export default function Login() {
         
         <div className="login-form-container animate-slideUp">
           <div className="welcome-section">
-            <div className="welcome-title animate-fadeIn">Welcome Back</div>
+            <div className="welcome-title animate-fadeIn">Bine ai revenit</div>
             <div className="welcome-subtitle animate-fadeIn">
-              Sign in to your account to manage your appointments
+              Autentifică-te în cont pentru a-ți gestiona programările
             </div>
             {location.state?.message && (
               <div className="success-message animate-fadeIn">
@@ -86,12 +86,12 @@ export default function Login() {
               
               <div className="form-group animate-slideUp">
                 <div className="password-header">
-                  <label htmlFor="password" className="form-label">Password</label>
-                  <Link 
+                  <label htmlFor="password" className="form-label">Parolă</label>
+                  <Link
                     to="/forgot-password"
                     className="forgot-password"
                   >
-                    Forgot password?
+                    Ai uitat parola?
                   </Link>
                 </div>
                 <input
@@ -110,22 +110,22 @@ export default function Login() {
                 className="login-button animate-fadeIn"
                 disabled={loading}
               >
-                {loading ? "Signing In..." : "Sign In"}
+                {loading ? "Se autentifică..." : "Autentifică-te"}
               </button>
             </form>
           </div>
           
           <div className="signup-prompt animate-fadeIn">
             <p className="signup-text">
-              Don't have an account?{" "}
+              Nu ai un cont?{" "}
               <Link to="/signup" className="signup-link">
-                Sign up
+                Înregistrează-te
               </Link>
             </p>
             <p className="signup-text">
-              Are you a doctor?{" "}
+              Ești doctor?{" "}
               <Link to="/login-doctor" className="signup-link">
-              Login here
+              Autentifică-te aici
               </Link>
             </p>
           </div>

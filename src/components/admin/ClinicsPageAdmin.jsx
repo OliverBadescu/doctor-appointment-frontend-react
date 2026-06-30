@@ -99,16 +99,16 @@ export default function ClinicsPageAdmin() {
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 80 },
-    { field: 'name', headerName: 'Name', flex: 1 },
-    { field: 'address', headerName: 'Address', flex: 2 },
+    { field: 'name', headerName: 'Nume', flex: 1 },
+    { field: 'address', headerName: 'Adresă', flex: 2 },
     {
       field: 'actions',
       type: 'actions',
-      headerName: 'Actions',
+      headerName: 'Acțiuni',
       width: 120,
       getActions: (params) => [
-        <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={handleOpenEdit(params.row)} />,
-        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={openDeleteDialog(params.row.id, params.row.name)} showInMenu />,
+        <GridActionsCellItem icon={<EditIcon />} label="Editează" onClick={handleOpenEdit(params.row)} />,
+        <GridActionsCellItem icon={<DeleteIcon />} label="Șterge" onClick={openDeleteDialog(params.row.id, params.row.name)} showInMenu />,
       ],
     },
   ];
@@ -116,9 +116,9 @@ export default function ClinicsPageAdmin() {
   return (
     <Box sx={{ width: '100%' }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h6">Clinics</Typography>
+        <Typography variant="h6">Clinici</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreate}>
-          Add Clinic
+          Adaugă clinică
         </Button>
       </Box>
 
@@ -139,17 +139,17 @@ export default function ClinicsPageAdmin() {
               <CloseIcon />
             </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6">
-              {editingClinic ? 'Edit Clinic' : 'Add Clinic'}
+              {editingClinic ? 'Editează clinică' : 'Adaugă clinică'}
             </Typography>
           </Toolbar>
         </AppBar>
-        <DialogTitle>{editingClinic ? 'Edit Clinic' : 'New Clinic'}</DialogTitle>
+        <DialogTitle>{editingClinic ? 'Editează clinică' : 'Clinică nouă'}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} mt={1}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Name"
+                label="Nume"
                 value={formValues.name}
                 onChange={(e) => setFormValues((v) => ({ ...v, name: e.target.value }))}
               />
@@ -157,7 +157,7 @@ export default function ClinicsPageAdmin() {
             <Grid item xs={12}>
               <TextField
                 fullWidth
-                label="Address"
+                label="Adresă"
                 value={formValues.address}
                 onChange={(e) => setFormValues((v) => ({ ...v, address: e.target.value }))}
               />
@@ -165,9 +165,9 @@ export default function ClinicsPageAdmin() {
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleClose}>Anulează</Button>
           <Button onClick={handleSubmit} variant="contained">
-            {editingClinic ? 'Save Changes' : 'Create'}
+            {editingClinic ? 'Salvează modificările' : 'Creează'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -175,17 +175,17 @@ export default function ClinicsPageAdmin() {
 
       <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog} maxWidth="sm">
         <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
-          <WarningIcon color="warning" sx={{ mr: 1 }} /> Confirm Deletion
+          <WarningIcon color="warning" sx={{ mr: 1 }} /> Confirmă ștergerea
         </DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete clinic "{clinicToDelete?.name}"? This action cannot be undone.
+            Sigur dorești să ștergi clinica "{clinicToDelete?.name}"? Această acțiune nu poate fi anulată.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog}>Cancel</Button>
+          <Button onClick={closeDeleteDialog}>Anulează</Button>
           <Button onClick={confirmDelete} variant="contained" color="error">
-            Delete
+            Șterge
           </Button>
         </DialogActions>
       </Dialog>

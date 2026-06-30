@@ -32,10 +32,10 @@ export default function AdminHomePage() {
   }, [isAuthReady]);
 
   const metrics = [
-    { label: 'Users', value: users },
-    { label: 'Doctors', value: doctors },
-    { label: 'Clinics', value: clinics },
-    { label: 'Appointments', value: appointments },
+    { label: 'Utilizatori', value: users },
+    { label: 'Doctori', value: doctors },
+    { label: 'Clinici', value: clinics },
+    { label: 'Programări', value: appointments },
   ];
 
   return (

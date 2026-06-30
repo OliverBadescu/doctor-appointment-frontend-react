@@ -38,7 +38,7 @@ export default function Signup() {
     const success = await handleRegister(registerRequest);
 
     if (success) {
-      navigate('/login', { state: { message: 'Registration successful! Please log in.' } });
+      navigate('/login', { state: { message: 'Înregistrare reușită! Te rugăm să te autentifici.' } });
     }
   };
 
@@ -63,9 +63,9 @@ export default function Signup() {
         
         <div className="form-card">
           <div className="card-header">
-            <div className="card-title animate-fadeIn">Create an Account</div>
+            <div className="card-title animate-fadeIn">Creează un cont</div>
             <div className="card-description animate-fadeIn" >
-              Sign up to start booking your medical appointments
+              Înregistrează-te pentru a începe să faci programări medicale
             </div>
           </div>
           
@@ -80,11 +80,11 @@ export default function Signup() {
             
             <form onSubmit={handleSubmit} className="signup-form">
               <div className="form-group animate-slideUp">
-                <label htmlFor="name" className="form-label">Full Name</label>
+                <label htmlFor="name" className="form-label">Nume complet</label>
                 <input
                   id="name"
                   className="form-input"
-                  placeholder="John Doe"
+                  placeholder="Ion Popescu"
                   value={name}
                   onChange={handleChange}
                   required
@@ -105,7 +105,7 @@ export default function Signup() {
               </div>
               
               <div className="form-group animate-slideUp" >
-                <label htmlFor="password" className="form-label">Password</label>
+                <label htmlFor="password" className="form-label">Parolă</label>
                 <input
                   id="password"
                   className="form-input"
@@ -118,7 +118,7 @@ export default function Signup() {
               </div>
               
               <div className="form-group animate-slideUp" >
-                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                <label htmlFor="confirmPassword" className="form-label">Confirmă parola</label>
                 <input
                   id="confirmPassword"
                   className="form-input"
@@ -129,7 +129,7 @@ export default function Signup() {
                   required
                 />
                 {password !== confirmPassword && confirmPassword !== '' && (
-                  <div className="password-mismatch animate-fadeIn">Passwords do not match</div>
+                  <div className="password-mismatch animate-fadeIn">Parolele nu se potrivesc</div>
                 )}
               </div>
               
@@ -139,16 +139,16 @@ export default function Signup() {
               
                 disabled={loading || (password !== confirmPassword && confirmPassword !== '')}
               >
-                {loading ? "Creating Account..." : "Create Account"}
+                {loading ? "Se creează contul..." : "Creează cont"}
               </button>
             </form>
           </div>
           
           <div className="card-footer animate-fadeIn" >
             <p className="login-prompt">
-              Already have an account?{" "}
+              Ai deja un cont?{" "}
               <Link to="/login" className="login-link">
-                Sign in
+                Autentifică-te
               </Link>
             </p>
           </div>

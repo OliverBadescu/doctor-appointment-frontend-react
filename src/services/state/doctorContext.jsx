@@ -87,7 +87,7 @@ export function DoctorProvider({ children }) {
     try {
       const data = await login(loginRequest);
       if (!data.success) {
-        setErrors(["Invalid credentials, please try again"]);
+        setErrors(["Date de autentificare invalide, te rugăm să încerci din nou"]);
         return { success: false };
       } else {
         setErrors([]);
@@ -96,7 +96,7 @@ export function DoctorProvider({ children }) {
         return { success: true };
       }
     } catch {
-      setErrors(["An error occurred during login"]);
+      setErrors(["A apărut o eroare la autentificare"]);
       return { success: false };
     } finally {
       setLoading(false);

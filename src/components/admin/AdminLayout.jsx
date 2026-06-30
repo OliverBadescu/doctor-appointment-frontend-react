@@ -90,10 +90,10 @@ export default function AdminLayout() {
   const closeMobileDrawer = () => setMobileOpen(false);
 
   const navItems = [
-    { label: 'Home', icon: <HomeIcon />, path: '/admin/home' },
-    { label: 'Clinics', icon: <LocationOnIcon />, path: '/admin/clinics' },
-    { label: 'Doctors', icon: <LocalHospitalIcon />, path: '/admin/doctors' },
-    { label: 'Patients', icon: <PeopleIcon />, path: '/admin/patients' },
+    { label: 'Acasă', icon: <HomeIcon />, path: '/admin/home' },
+    { label: 'Clinici', icon: <LocationOnIcon />, path: '/admin/clinics' },
+    { label: 'Doctori', icon: <LocalHospitalIcon />, path: '/admin/doctors' },
+    { label: 'Pacienți', icon: <PeopleIcon />, path: '/admin/patients' },
   ];
 
   const navList = (
@@ -135,7 +135,7 @@ export default function AdminLayout() {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap sx={{ flexGrow: 1 }}>
-            Admin Dashboard
+            Panou administrator
           </Typography>
           <Button
             color="inherit"
@@ -143,12 +143,12 @@ export default function AdminLayout() {
             startIcon={<LogoutIcon />}
             sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
           >
-            Logout
+            Deconectare
           </Button>
           <IconButton
             color="inherit"
             onClick={handleLogout}
-            aria-label="Logout"
+            aria-label="Deconectare"
             sx={{ display: { xs: 'inline-flex', sm: 'none' } }}
           >
             <LogoutIcon />

@@ -53,7 +53,7 @@ export default function DoctorsPageAdmin() {
       setClinics(clinicsRes.body.list || []);
       const doctorsWithClinicNames = (doctorsRes.body.list || []).map(doctor => ({
         ...doctor,
-        clinicName: doctor.clinic.id ? clinicMap[doctor.clinic.id] : 'Not Assigned'
+        clinicName: doctor.clinic.id ? clinicMap[doctor.clinic.id] : 'Neatribuit'
       }));
 
 
@@ -77,12 +77,13 @@ export default function DoctorsPageAdmin() {
     
     fields.forEach(field => {
       if (!form[field]) {
-        newErrors[field] = `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+        const fieldLabels = { fullName: 'Nume complet', password: 'Parolă', email: 'Email', specialization: 'Specializare', phone: 'Telefon', clinic: 'Clinică' };
+        newErrors[field] = `Câmpul "${fieldLabels[field] || field}" este obligatoriu`;
       }
     });
 
     if (form.email && !/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = 'Please enter a valid email address';
+      newErrors.email = 'Te rugăm să introduci o adresă de email validă';
     }
 
     setErrors(newErrors);
@@ -137,7 +138,7 @@ export default function DoctorsPageAdmin() {
         fetchData();
       } catch (error) {
         console.error("Error deleting doctor:", error);
-        alert("Failed to delete doctor. Please try again.");
+        alert("Ștergerea doctorului a eșuat. Te rugăm să încerci din nou.");
         closeDeleteDialog();
       }
     }
@@ -182,25 +183,25 @@ export default function DoctorsPageAdmin() {
       close();
     } catch (error) {
       console.error("Error saving doctor:", error);
-      alert("Failed to save doctor. Please try again.");
+      alert("Salvarea doctorului a eșuat. Te rugăm să încerci din nou.");
     }
   };
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 80 },
-    { field: 'fullName', headerName: 'Name', flex: 1 },
+    { field: 'fullName', headerName: 'Nume', flex: 1 },
     { field: 'email', headerName: 'Email', flex: 1 },
-    { field: 'specialization', headerName: 'Specialization', flex: 1 },
-    { field: 'phone', headerName: 'Phone', width: 150 },
-    { field: 'clinicName', headerName: 'Clinic', width: 180 },
-    { 
-      field: 'actions', 
-      type: 'actions', 
-      headerName: 'Actions', 
+    { field: 'specialization', headerName: 'Specializare', flex: 1 },
+    { field: 'phone', headerName: 'Telefon', width: 150 },
+    { field: 'clinicName', headerName: 'Clinică', width: 180 },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Acțiuni',
       width: 120,
       getActions: (p) => [
-        <GridActionsCellItem icon={<EditIcon />} label="Edit" onClick={openEdit(p.row)} />,
-        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={openDeleteDialog(p.row.id, p.row.fullName)} showInMenu />
+        <GridActionsCellItem icon={<EditIcon />} label="Editează" onClick={openEdit(p.row)} />,
+        <GridActionsCellItem icon={<DeleteIcon />} label="Șterge" onClick={openDeleteDialog(p.row.id, p.row.fullName)} showInMenu />
       ]
     }
   ];
@@ -208,8 +209,8 @@ export default function DoctorsPageAdmin() {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-        <Typography variant="h6">Doctors</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>Add Doctor</Button>
+        <Typography variant="h6">Doctori</Typography>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate}>Adaugă doctor</Button>
       </Box>
       
       <DataGrid 
@@ -229,7 +230,7 @@ export default function DoctorsPageAdmin() {
           <Toolbar>
             <IconButton edge="start" color="inherit" onClick={close}><CloseIcon/></IconButton>
             <Typography sx={{ml: 2, flex: 1}} variant="h6">
-              {editing ? 'Edit Doctor' : 'New Doctor'}
+              {editing ? 'Editează doctor' : 'Doctor nou'}
             </Typography>
           </Toolbar>
         </AppBar>
@@ -239,7 +240,7 @@ export default function DoctorsPageAdmin() {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Full Name"
+                label="Nume complet"
                 name="fullName"
                 value={form.fullName}
                 onChange={handleChange}
@@ -266,7 +267,7 @@ export default function DoctorsPageAdmin() {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Password"
+                label="Parolă"
                 name="password"
                 type="password"
                 value={form.password}
@@ -280,7 +281,7 @@ export default function DoctorsPageAdmin() {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Phone"
+                label="Telefon"
                 name="phone"
                 value={form.phone}
                 onChange={handleChange}
@@ -293,7 +294,7 @@ export default function DoctorsPageAdmin() {
             <Grid item xs={12} md={6}>
               <TextField
                 fullWidth
-                label="Specialization"
+                label="Specializare"
                 name="specialization"
                 value={form.specialization}
                 onChange={handleChange}
@@ -305,13 +306,13 @@ export default function DoctorsPageAdmin() {
 
             <Grid item xs={12} md={6}>
               <FormControl fullWidth error={!!errors.clinic} required>
-                <InputLabel id="clinic-select-label">Clinic </InputLabel>
+                <InputLabel id="clinic-select-label">Clinică </InputLabel>
                 <Select
                   labelId="clinic-select-label"
                   id="clinic-select"
                   name="clinic"
                   value={form.clinic}
-                  label="Clinic"
+                  label="Clinică"
                   onChange={handleChange}
                   sx={{ width: '100%', minWidth: '200px' }}
                   displayEmpty
@@ -330,30 +331,30 @@ export default function DoctorsPageAdmin() {
         </DialogContent>
         
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={close}>Cancel</Button>
-          <Button 
-            onClick={handleSubmit} 
-            variant="contained" 
+          <Button onClick={close}>Anulează</Button>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
             color="primary"
           >
-            {editing ? 'Save' : 'Create'}
+            {editing ? 'Salvează' : 'Creează'}
           </Button>
         </DialogActions>
       </Dialog>
 
       <Dialog open={deleteDialogOpen} onClose={closeDeleteDialog} maxWidth="sm">
         <DialogTitle sx={{ display: 'flex', alignItems: 'center' }}>
-          <WarningIcon color="warning" sx={{ mr: 1 }} /> Confirm Deletion
+          <WarningIcon color="warning" sx={{ mr: 1 }} /> Confirmă ștergerea
         </DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to delete Dr. {doctorToDelete?.name}? This action cannot be undone.
+            Sigur dorești să ștergi Dr. {doctorToDelete?.name}? Această acțiune nu poate fi anulată.
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={closeDeleteDialog}>Cancel</Button>
+          <Button onClick={closeDeleteDialog}>Anulează</Button>
           <Button onClick={confirmDelete} variant="contained" color="error">
-            Delete
+            Șterge
           </Button>
         </DialogActions>
       </Dialog>

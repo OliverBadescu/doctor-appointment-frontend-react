@@ -68,17 +68,17 @@ export default function NewAppointment() {
         if (clinicsResponse.success) {
           setClinics(clinicsResponse.body.list);
         } else {
-          setError("Failed to load clinics: " + clinicsResponse.message);
+          setError("Încărcarea clinicilor a eșuat: " + clinicsResponse.message);
         }
         
         const doctorsResponse = await getAllDoctors();
         if (doctorsResponse.success) {
           setDoctors(doctorsResponse.body.list);
         } else {
-          setError("Failed to load doctors: " + doctorsResponse.message);
+          setError("Încărcarea doctorilor a eșuat: " + doctorsResponse.message);
         }
       } catch (err) {
-        setError("An error occurred while fetching data");
+        setError("A apărut o eroare la preluarea datelor");
         console.error(err);
       } finally {
         setIsLoading(false);
@@ -132,16 +132,16 @@ export default function NewAppointment() {
             setAvailableTimeSlots(availableSlots);
             
             if (availableSlots.length === 0) {
-              setError("No available appointment slots for this date");
+              setError("Nu există ore disponibile pentru programare la această dată");
             } else {
               setError("");
             }
           } else {
-            setError("Failed to load doctor's availability: " + (response.message || "Unknown error"));
+            setError("Încărcarea disponibilității doctorului a eșuat: " + (response.message || "Eroare necunoscută"));
             setAvailableTimeSlots([]);
           }
         } catch (err) {
-          setError("An error occurred while fetching doctor's availability");
+          setError("A apărut o eroare la preluarea disponibilității doctorului");
           console.error(err);
           setAvailableTimeSlots([]);
         } finally {
@@ -290,7 +290,7 @@ export default function NewAppointment() {
   };
 
   const formatReviewDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString('ro-RO', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
@@ -301,7 +301,7 @@ export default function NewAppointment() {
     e.preventDefault();
     
     if (!selectedClinic || !selectedDoctor || !date || !time || !reason) {
-      setError("Please fill all required fields");
+      setError("Te rugăm să completezi toate câmpurile obligatorii");
       return;
     }
     
@@ -329,15 +329,15 @@ export default function NewAppointment() {
           doctor: selectedDoctorName,
           date: formatDate(date),
           time: time,
-          clinic: clinics.find(c => c.id == selectedClinic)?.name || "Selected Clinic"
+          clinic: clinics.find(c => c.id == selectedClinic)?.name || "Clinică selectată"
         });
         
         setSuccessDialogOpen(true);
       } else {
-        setError("Failed to book appointment: " + response.message);
+        setError("Realizarea programării a eșuat: " + response.message);
       }
     } catch (err) {
-      setError("An error occurred while booking your appointment");
+      setError("A apărut o eroare la realizarea programării");
       console.error(err);
     } finally {
       setIsLoading(false);
@@ -353,14 +353,14 @@ export default function NewAppointment() {
 
 
   if (isLoading && (!clinics.length || !doctors.length)) {
-    return <div className="loading-container animate-fadeIn">Loading appointment data...</div>;
+    return <div className="loading-container animate-fadeIn">Se încarcă datele programării...</div>;
   }
 
   return (
     <div className="appointment-container animate-fadeIn">
       <div className="appointment-header animate-slideUp">
-        <h1 className="appointment-title">Book an Appointment</h1>
-        <p className="appointment-subtitle">Schedule your visit with a healthcare professional</p>
+        <h1 className="appointment-title">Fă o programare</h1>
+        <p className="appointment-subtitle">Programează-ți vizita la un profesionist în sănătate</p>
       </div>
       
       {error && (
@@ -371,23 +371,23 @@ export default function NewAppointment() {
       
       <div className="appointment-card animate-slideUp">
         <div className="card-header animate-fadeIn">
-          <h2 className="card-title">Appointment Details</h2>
+          <h2 className="card-title">Detalii programare</h2>
           <p className="card-description">
-            Fill in the information below to schedule your appointment
+            Completează informațiile de mai jos pentru a-ți programa consultația
           </p>
         </div>
         <div className="card-content animate-fadeIn delay-100">
           <form onSubmit={handleSubmit} className="appointment-form">
             <div className="form-fields animate-fadeIn delay-200">
               <div className="form-group animate-slideUp delay-100">
-                <label htmlFor="clinic" className="form-label">Select Clinic</label>
+                <label htmlFor="clinic" className="form-label">Selectează clinica</label>
                 <select 
                   id="clinic" 
                   className="form-select"
                   value={selectedClinic}
                   onChange={(e) => setSelectedClinic(e.target.value)}
                 >
-                  <option value="">Select a clinic</option>
+                  <option value="">Selectează o clinică</option>
                   {clinics.map((clinic) => (
                     <option key={clinic.id} value={clinic.id}>
                       {clinic.name}
@@ -397,7 +397,7 @@ export default function NewAppointment() {
               </div>
               
               <div className="form-group animate-slideUp delay-200">
-                <label htmlFor="doctor" className="form-label">Select Doctor</label>
+                <label htmlFor="doctor" className="form-label">Selectează doctorul</label>
                 <select 
                   id="doctor" 
                   className="form-select"
@@ -406,7 +406,7 @@ export default function NewAppointment() {
                   disabled={!selectedClinic}
                 >
                   <option value="">
-                    {selectedClinic ? "Select a doctor" : "First select a clinic"}
+                    {selectedClinic ? "Selectează un doctor" : "Selectează mai întâi o clinică"}
                   </option>
                   {filteredDoctors.map((doctor) => (
                     <option key={doctor.id} value={doctor.id}>
@@ -425,7 +425,7 @@ export default function NewAppointment() {
                   >
                     <div className="reviews-summary">
                       <Typography variant="h6" sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                        Doctor Reviews
+                        Recenzii doctori
                       </Typography>
                       {reviewsLoading ? (
                         <CircularProgress size={20} />
@@ -438,12 +438,12 @@ export default function NewAppointment() {
                             size="small"
                           />
                           <Typography variant="body2" color="text.secondary">
-                            {calculateAverageRating(doctorReviews)} ({doctorReviews.length} review{doctorReviews.length !== 1 ? 's' : ''})
+                            {calculateAverageRating(doctorReviews)} ({doctorReviews.length} recenzi{doctorReviews.length !== 1 ? 'i' : 'e'})
                           </Typography>
                         </div>
                       ) : (
                         <Typography variant="body2" color="text.secondary">
-                          No reviews yet
+                          Nicio recenzie încă
                         </Typography>
                       )}
                     </div>
@@ -457,7 +457,7 @@ export default function NewAppointment() {
                       {reviewsLoading ? (
                         <div className="reviews-loading">
                           <CircularProgress size={24} />
-                          <Typography sx={{ mt: 1 }}>Loading reviews...</Typography>
+                          <Typography sx={{ mt: 1 }}>Se încarcă recenziile...</Typography>
                         </div>
                       ) : doctorReviews.length > 0 ? (
                         <div>
@@ -467,7 +467,7 @@ export default function NewAppointment() {
                                 <div className="reviewer-info">
                                   <PersonIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
                                   <Typography variant="subtitle2">
-                                    Patient #{review.userId || 'Anonymous'}
+                                    Pacient #{review.userId || 'Anonim'}
                                   </Typography>
                                   <Rating value={review.rating || 0} readOnly size="small" />
                                 </div>
@@ -493,7 +493,7 @@ export default function NewAppointment() {
                             <div className="pagination-container">
                               <div className="pagination-info">
                                 <Typography variant="body2" color="text.secondary">
-                                  Showing {Math.min((currentReviewPage - 1) * reviewsPerPage + 1, doctorReviews.length)} - {Math.min(currentReviewPage * reviewsPerPage, doctorReviews.length)} of {doctorReviews.length} reviews
+                                  Se afișează {Math.min((currentReviewPage - 1) * reviewsPerPage + 1, doctorReviews.length)} - {Math.min(currentReviewPage * reviewsPerPage, doctorReviews.length)} din {doctorReviews.length} recenzii
                                 </Typography>
                               </div>
                               <div className="pagination-controls">
@@ -503,7 +503,7 @@ export default function NewAppointment() {
                                   onClick={() => handleReviewPageChange(currentReviewPage - 1)}
                                   sx={{ minWidth: 'auto', px: 1 }}
                                 >
-                                  Previous
+                                  Anterior
                                 </Button>
                                 
                                 <div className="page-numbers">
@@ -532,7 +532,7 @@ export default function NewAppointment() {
                                   onClick={() => handleReviewPageChange(currentReviewPage + 1)}
                                   sx={{ minWidth: 'auto', px: 1 }}
                                 >
-                                  Next
+                                  Următor
                                 </Button>
                               </div>
                             </div>
@@ -541,7 +541,7 @@ export default function NewAppointment() {
                       ) : (
                         <div className="no-reviews">
                           <Typography variant="body2">
-                            This doctor hasn't received any reviews yet. Be the first to share your experience!
+                            Acest doctor nu a primit încă nicio recenzie. Fii primul care își împărtășește experiența!
                           </Typography>
                         </div>
                       )}
@@ -552,10 +552,10 @@ export default function NewAppointment() {
               
               {/* Inline Calendar */}
               <div className="form-group animate-slideUp delay-300">
-                <label className="form-label">Select Date</label>
+                <label className="form-label">Selectează data</label>
                 {!selectedDoctor ? (
                   <div className="calendar-disabled-message">
-                    Please select a doctor first
+                    Selectează mai întâi un doctor
                   </div>
                 ) : (
                   <div className="inline-calendar">
@@ -588,7 +588,7 @@ export default function NewAppointment() {
                       </button>
                     </div>
                     <div className="calendar-grid">
-                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                      {['Dum', 'Lun', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm'].map(day => (
                         <div key={day} className="calendar-weekday">{day}</div>
                       ))}
                       {(() => {
@@ -626,7 +626,7 @@ export default function NewAppointment() {
                         return cells;
                       })()}
                     </div>
-                    <p className="calendar-hint">Weekends are not available</p>
+                    <p className="calendar-hint">Weekendurile nu sunt disponibile</p>
                   </div>
                 )}
               </div>
@@ -635,20 +635,20 @@ export default function NewAppointment() {
               <div className="form-group animate-slideUp delay-400">
                 <label className="form-label">
                   <AccessTimeIcon sx={{ fontSize: 18, verticalAlign: 'text-bottom', mr: 0.5 }} />
-                  Select Time
+                  Selectează ora
                 </label>
                 {!date ? (
                   <div className="calendar-disabled-message">
-                    Please select a date first
+                    Selectează mai întâi o dată
                   </div>
                 ) : availabilityLoading ? (
                   <div className="timeslot-loading">
                     <CircularProgress size={24} />
-                    <span>Loading available times...</span>
+                    <span>Se încarcă orele disponibile...</span>
                   </div>
                 ) : availableTimeSlots.length === 0 ? (
                   <div className="timeslot-empty">
-                    No available slots for this date
+                    Nu există ore disponibile pentru această dată
                   </div>
                 ) : (
                   <div className="timeslot-grid">
@@ -667,11 +667,11 @@ export default function NewAppointment() {
               </div>
               
               <div className="form-group animate-slideUp delay-500">
-                <label htmlFor="reason" className="form-label">Reason for Visit</label>
+                <label htmlFor="reason" className="form-label">Motivul vizitei</label>
                 <textarea
                   id="reason"
                   className="form-textarea"
-                  placeholder="Please briefly describe your symptoms or reason for the appointment"
+                  placeholder="Descrie pe scurt simptomele sau motivul programării"
                   rows={4}
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
@@ -685,7 +685,7 @@ export default function NewAppointment() {
                 className="cancel-button"
                 onClick={() => navigate("/appointment")}
               >
-                Cancel
+                Anulează
               </button>
               <button 
                 type="submit" 
@@ -695,9 +695,9 @@ export default function NewAppointment() {
                 {isLoading ? (
                   <>
                     <CircularProgress size={20} color="inherit" style={{ marginRight: '8px' }} />
-                    Booking Appointment...
+                    Se realizează programarea...
                   </>
-                ) : "Book Appointment"}
+                ) : "Fă o programare"}
               </button>
             </div>
           </form>
@@ -713,7 +713,7 @@ export default function NewAppointment() {
         fullWidth
       >
         <DialogTitle id="appointment-success-dialog" sx={{ textAlign: 'center', pb: 0 }}>
-          Appointment Booked Successfully!
+          Programare realizată cu succes!
         </DialogTitle>
         
         <DialogContent className="success-dialog-content">
@@ -722,7 +722,7 @@ export default function NewAppointment() {
           </Fade>
           
           <DialogContentText>
-            Your appointment has been successfully scheduled. You can view all your appointments in the appointments section.
+            Programarea ta a fost realizată cu succes. Poți vedea toate programările în secțiunea de programări.
           </DialogContentText>
           
           {appointmentDetails && (
@@ -732,15 +732,15 @@ export default function NewAppointment() {
                 <span>{appointmentDetails.doctor}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Clinic:</span>
+                <span className="detail-label">Clinică:</span>
                 <span>{appointmentDetails.clinic}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Date:</span>
+                <span className="detail-label">Dată:</span>
                 <span>{appointmentDetails.date}</span>
               </div>
               <div className="detail-row">
-                <span className="detail-label">Time:</span>
+                <span className="detail-label">Oră:</span>
                 <span>{appointmentDetails.time}</span>
               </div>
             </div>
@@ -754,7 +754,7 @@ export default function NewAppointment() {
             color="primary"
             sx={{ minWidth: '150px' }}
           >
-            Go to My Appointments
+            Mergi la programările mele
           </Button>
         </DialogActions>
       </Dialog>
